@@ -1,13 +1,12 @@
 baseURL = 'http://example.org/'
-copyright = "{year}" # To make 2007 - 2022. Just add before {year} example: 2007 - {year}
-languageCode = 'en-US'
-defaultContentLanguage = 'en'
+copyright = "{year}"
 theme = "lowkey"
-title = 'Enhanced Lowkey Hugo'
+title = 'Zac'
+languageCode = 'zh-CN'
+defaultContentLanguage = 'zh'
 enableRobotsTXT = true
 summaryLength = 15
 paginate = 5
-
 
 [markup]
   [markup.highlight]
@@ -24,3 +23,6 @@ paginate = 5
     noHl = false
     style = 'dracula'
     tabWidth = 4
+
+[outputs]
+  home = ["HTML", "RSS", "JSON"]

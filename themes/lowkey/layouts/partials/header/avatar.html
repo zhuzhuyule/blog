@@ -1,13 +1,13 @@
-{{ $avatar := resources.GetMatch .Site.Params.avatar }} 
-{{ $tiny := ($avatar.Fill "80x80 q90") }}
+{{ $avatar := resources.GetMatch .Site.Params.avatar }}
+{{ $tiny := ($avatar.Fill "40x40 q90") }}
 
-<div class="flex-none w-20 h-20 rounded-full overflow-hidden">
+<div class="flex-none w-10 h-10 rounded-full overflow-hidden">
   <a href="{{ .Site.BaseURL }}">
     <img
-      srcset="{{- with $tiny.RelPermalink -}}{{.}} 80w{{- end -}}"
+      srcset="{{- with $tiny.RelPermalink -}}{{.}} 40w{{- end -}}"
       src="{{ $avatar.RelPermalink }}"
-      width="{{ $avatar.Width }}"
-      height="{{ $avatar.Height }}"
+      width="40"
+      height="40"
       alt="{{ .Site.Title }}"
     />
   </a>

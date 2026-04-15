@@ -1,5 +1,13 @@
 {{ define "main" }}
 
+{{/* 桌面端返回链接 */}}
+<a href="javascript:history.length>1?history.back():location.href='/'" class="back-link hidden sm:inline-flex">
+  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+  </svg>
+  返回
+</a>
+
 <article class="flex flex-col gap-10">
   <header class="flex flex-col gap-2">
     <h2 class="title-large">{{ .Title }}</h2>

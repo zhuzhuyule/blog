@@ -3,6 +3,7 @@
 <meta charset="UTF-8" />
 <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
 <title>{{ if .IsHome }}{{ .Site.Title }}{{ else }}{{ .Title }}{{ end }}</title>
 <meta
   name="description"
@@ -12,6 +13,24 @@
 <link rel="robots" href="/robots.txt" />
 
 <link rel="icon" type="image/x-icon" href="{{ $favicon.RelPermalink }}" />
+
+<script>
+(function(){
+  var t = sessionStorage.getItem('theme') || 'auto';
+  var dark = t === 'dark' || (t === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  if (dark) document.documentElement.classList.add('dark');
+  document.documentElement.setAttribute('data-theme-mode', t);
+
+  var w = sessionStorage.getItem('siteWidth');
+  if (w) document.documentElement.style.setProperty('--site-width', w + 'px');
+})();
+</script>
+<style>
+  .theme-state-icon { display: none !important; }
+  [data-theme-mode="light"] .theme-state-icon[data-theme="light"],
+  [data-theme-mode="dark"] .theme-state-icon[data-theme="dark"],
+  [data-theme-mode="auto"] .theme-state-icon[data-theme="auto"] { display: inline-flex !important; }
+</style>
 
 {{ if .Site.Config.Services.GoogleAnalytics.ID }}
 <!-- Google Analytics -->

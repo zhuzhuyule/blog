@@ -1,14 +1,39 @@
-<nav>
+<nav class="flex items-center">
   <ul>
-    {{ $currentPage := . }} 
-    {{ range site.Menus.main }} 
-    {{- $menu_item_url := (cond (strings.HasSuffix .URL "/") .URL (printf "%s/" .URL) ) | absLangURL }} 
+    {{ $currentPage := . }}
+    {{ range site.Menus.main }}
+    {{- $menu_item_url := (cond (strings.HasSuffix .URL "/") .URL (printf "%s/" .URL) ) | absLangURL }}
     {{- $page_url := $currentPage.Permalink | absLangURL }}
+    {{- $isHome := and (eq .Identifier "home") $currentPage.IsHome }}
+    {{ if not $isHome }}
     <li>
       <a href="{{ .URL }}" class="{{ if eq $menu_item_url $page_url }} active {{ end }}">
         {{ .Name }}
       </a>
     </li>
     {{ end }}
+    {{ end }}
+    {{/* 工具按钮组 */}}
+    <li class="flex items-center gap-0.5">
+      <button onclick="openSearch()" class="nav-icon-btn" aria-label="搜索" title="搜索">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+        </svg>
+      </button>
+      <button onclick="cycleTheme()" class="nav-icon-btn" aria-label="切换主题" id="theme-toggle">
+        <span class="theme-state-icon" data-theme="light" title="日间模式">{{ partial "utils/icon" "sun" }}</span>
+        <span class="theme-state-icon" data-theme="dark" title="夜间模式">{{ partial "utils/icon" "moon" }}</span>
+        <span class="theme-state-icon" data-theme="auto" title="跟随系统">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+          </svg>
+        </span>
+      </button>
+      <button onclick="toggleWidth()" class="nav-icon-btn" id="width-toggle" aria-label="切换宽度" title="宽度：1000px">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16M8 4v16M16 4v16"/>
+        </svg>
+      </button>
+    </li>
   </ul>
 </nav>

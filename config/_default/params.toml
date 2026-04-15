@@ -1,33 +1,22 @@
-# Homepage Config
 isSinglePage = true
 
-# Meta Config
-description = "A simple and humble blog"
+description = "代码 · 科技 · 折腾"
 
-# Header Configuration
 avatar = "img/profile-picture.jpg"
 
-# Cover Image (Homepage Banner)
-coverImage = "img/cover.jpg"
-enableCover = true
-
-# Favicon
 favicon = "icons/favicon.ico"
 
-# Social Links Configuration
 [social]
-  github = "https://github.com/yourusername"
-  twitter = "https://twitter.com/yourusername"
-  email = "mailto:your@email.com"
+  github = "https://github.com/zhuzhuyule"
+  twitter = "https://x.com/zhuzhuzacx"
+  email = "mailto:blog@ause.cc"
   rss = true
 
-# Disqus comment system
 disqusShortname = ""
 
 [emoji]
   enableEmoji = true
 
-# Giscus comment system
 [giscus]
   enable = false
   repo = ""

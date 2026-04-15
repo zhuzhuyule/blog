@@ -1,6 +1,6 @@
 [latestPosts]
-    other = 'Latest posts'
-    
+    other = 'Latest Posts'
+
 [readMore]
     other = 'Read more'
 
@@ -8,10 +8,22 @@
     other = 'Summary'
 
 [estimatedReadingTime]
-    other = 'Estimated reading time: %d minutes'
+    other = '%d min read'
+
+[readingTimeUnit]
+    other = 'min read'
+
+[search]
+    other = 'Search posts...'
+
+[searchNoResult]
+    other = 'No results found'
+
+[translateHint]
+    other = "This post is in Chinese. Use your browser's built-in translation (right-click → Translate) to read it in English."
 
 [404_title]
     other = 'Page not found'
 
 [404_text]
-    other = "Looks like you've followed a broken link or entered a URL that doesn't exist on this site."
+    other = "The page you're looking for doesn't exist."

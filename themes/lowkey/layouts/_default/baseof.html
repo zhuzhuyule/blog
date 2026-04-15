@@ -1,20 +1,227 @@
 <!DOCTYPE html>
-<html lang="{{ .Site.LanguageCode | default `en` }}" class="scroll-smooth dark">
+<html lang="{{ .Site.LanguageCode | default `en` }}" class="scroll-smooth">
   <head>
     {{- partial "head/index" . -}}
   </head>
 
-  <body class="max-w-screen-md mx-auto px-2.5">
-    <div class="header">
-      {{ partial "header/index" . }}
-      {{ partial "header/theme-button" . }}
-    </div>
-  
-    <main id="content">
+  <body class="flex flex-col min-h-screen site-container">
+    {{ partial "header/index" . }}
+
+    <main id="content" class="flex-1 page-animate">
       {{- block "main" . -}}
       {{- end }}
     </main>
 
     {{- partial "footer/index" . -}}
+
+    {{/* 回到顶部 */}}
+    <button id="back-to-top" onclick="window.scrollTo({top:0})" aria-label="回到顶部"
+      class="fixed bottom-6 right-6 w-9 h-9 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400 shadow opacity-0 pointer-events-none transition-opacity duration-300 flex items-center justify-center z-40 hover:bg-gray-300 dark:hover:bg-gray-600">
+      <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/>
+      </svg>
+    </button>
+
+    <script>
+    /* ---- 移动端菜单 ---- */
+    function toggleMobileMenu() {
+      var menu = document.getElementById('mobile-menu');
+      var overlay = document.getElementById('mobile-overlay');
+      var iconOpen = document.getElementById('menu-icon-open');
+      var iconClose = document.getElementById('menu-icon-close');
+      if (!menu) return;
+      var isOpen = menu.classList.contains('open');
+      menu.classList.toggle('open');
+      overlay.classList.toggle('open');
+      if (iconOpen) iconOpen.classList.toggle('hidden');
+      if (iconClose) iconClose.classList.toggle('hidden');
+      document.body.style.overflow = isOpen ? '' : 'hidden';
+    }
+
+    function mobileSearch() {
+      toggleMobileMenu();
+      setTimeout(openSearch, 300);
+    }
+
+    /* ---- 主题切换（三态：light / dark / auto） ---- */
+    var themeOrder = ['light', 'dark', 'auto'];
+    var themeLabels = { light: '日间', dark: '夜间', auto: '自动' };
+
+    function getStoredTheme() {
+      return sessionStorage.getItem('theme') || 'auto';
+    }
+
+    function resolveTheme(mode) {
+      if (mode === 'auto') {
+        return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      }
+      return mode;
+    }
+
+    function applyTheme(mode) {
+      var resolved = resolveTheme(mode);
+      var html = document.documentElement;
+      if (resolved === 'dark') {
+        html.classList.add('dark');
+      } else {
+        html.classList.remove('dark');
+      }
+      html.setAttribute('data-theme-mode', mode);
+    }
+
+    function cycleTheme() {
+      var current = getStoredTheme();
+      var idx = themeOrder.indexOf(current);
+      var next = themeOrder[(idx + 1) % themeOrder.length];
+      sessionStorage.setItem('theme', next);
+      applyTheme(next);
+    }
+
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function() {
+      if (getStoredTheme() === 'auto') {
+        applyTheme('auto');
+      }
+    });
+
+    /* ---- 宽度切换（800 / 1000 / 1200） ---- */
+    var widthOptions = [800, 1000, 1200];
+
+    function getPreferredWidth() {
+      return parseInt(sessionStorage.getItem('siteWidth')) || 1000;
+    }
+
+    function applyWidth(w) {
+      document.documentElement.style.setProperty('--site-width', w + 'px');
+      var btn = document.getElementById('width-toggle');
+      if (btn) btn.title = '宽度：' + w + 'px';
+    }
+
+    function toggleWidth() {
+      var current = getPreferredWidth();
+      var idx = widthOptions.indexOf(current);
+      var next = widthOptions[(idx + 1) % widthOptions.length];
+      sessionStorage.setItem('siteWidth', next);
+      applyWidth(next);
+    }
+
+    /* ---- 搜索 ---- */
+    var searchIndex = null;
+
+    function loadSearchIndex() {
+      if (searchIndex) return Promise.resolve(searchIndex);
+      return fetch('/index.json').then(function(r) { return r.json(); }).then(function(data) {
+        searchIndex = data;
+        return data;
+      });
+    }
+
+    function openSearch() {
+      var overlay = document.getElementById('search-overlay');
+      if (!overlay) return;
+      overlay.classList.remove('hidden');
+      var input = document.getElementById('search-input');
+      if (input) { input.value = ''; input.focus(); }
+      document.getElementById('search-results').innerHTML = '';
+    }
+
+    function closeSearch() {
+      var overlay = document.getElementById('search-overlay');
+      if (overlay) overlay.classList.add('hidden');
+    }
+
+    document.addEventListener('keydown', function(e) {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        var overlay = document.getElementById('search-overlay');
+        if (!overlay) return;
+        overlay.classList.contains('hidden') ? openSearch() : closeSearch();
+      }
+      if (e.key === 'Escape') closeSearch();
+    });
+
+    /* ---- 初始化 ---- */
+    document.addEventListener('DOMContentLoaded', function() {
+      applyTheme(getStoredTheme());
+      applyWidth(getPreferredWidth());
+
+      /* 封面图：自然高度不足屏幕一半则隐藏 */
+      document.querySelectorAll('.post-cover img').forEach(function(img) {
+        function check() {
+          var minH = window.innerHeight / 2;
+          if (img.naturalHeight < minH) {
+            img.closest('.post-cover').style.display = 'none';
+          }
+        }
+        if (img.complete) { check(); } else { img.addEventListener('load', check); }
+      });
+
+      /* 代码块复制按钮 */
+      document.querySelectorAll('pre').forEach(function(pre) {
+        var wrapper = document.createElement('div');
+        wrapper.className = 'code-block';
+        pre.parentNode.insertBefore(wrapper, pre);
+        wrapper.appendChild(pre);
+
+        var btn = document.createElement('button');
+        btn.className = 'code-copy-btn';
+        btn.title = '复制';
+        btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2"/></svg>';
+        wrapper.appendChild(btn);
+
+        btn.addEventListener('click', function() {
+          var code = pre.querySelector('code');
+          var text = (code || pre).textContent;
+          navigator.clipboard.writeText(text).then(function() {
+            btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>';
+            setTimeout(function() {
+              btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2"/></svg>';
+            }, 1500);
+          });
+        });
+      });
+
+      /* 回到顶部按钮显隐 */
+      var topBtn = document.getElementById('back-to-top');
+      if (topBtn) {
+        window.addEventListener('scroll', function() {
+          if (window.scrollY > 300) {
+            topBtn.classList.remove('opacity-0', 'pointer-events-none');
+            topBtn.classList.add('opacity-100');
+          } else {
+            topBtn.classList.add('opacity-0', 'pointer-events-none');
+            topBtn.classList.remove('opacity-100');
+          }
+        });
+      }
+
+      var input = document.getElementById('search-input');
+      if (!input) return;
+      input.addEventListener('input', function() {
+        var query = this.value.toLowerCase().trim();
+        var results = document.getElementById('search-results');
+        if (!query) { results.innerHTML = ''; return; }
+
+        loadSearchIndex().then(function(index) {
+          var matches = index.filter(function(item) {
+            return item.title.toLowerCase().includes(query) ||
+                   item.summary.toLowerCase().includes(query);
+          });
+
+          if (matches.length === 0) {
+            var noResultText = results.getAttribute('data-no-result') || 'No results found';
+          results.innerHTML = '<div class="px-4 py-8 text-center text-gray-500 dark:text-gray-400 text-sm">' + noResultText + '</div>';
+            return;
+          }
+
+          results.innerHTML = matches.map(function(item) {
+            return '<a href="' + item.url + '" class="block px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 border-b border-gray-100 dark:border-gray-700 last:border-0">' +
+              '<div class="font-medium text-gray-900 dark:text-gray-100 text-sm">' + item.title + '</div>' +
+              '<div class="text-xs text-gray-500 dark:text-gray-400 mt-1">' + item.date + '</div>' +
+            '</a>';
+          }).join('');
+        });
+      });
+    });
+    </script>
   </body>
 </html>

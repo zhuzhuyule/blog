@@ -1,0 +1,26 @@
+[latestPosts]
+    other = '最新文章'
+
+[readMore]
+    other = '阅读更多'
+
+[summary]
+    other = '摘要'
+
+[estimatedReadingTime]
+    other = '%d 分钟阅读'
+
+[readingTimeUnit]
+    other = '分钟阅读'
+
+[search]
+    other = '搜索文章...'
+
+[searchNoResult]
+    other = '没有找到相关文章'
+
+[404_title]
+    other = '页面未找到'
+
+[404_text]
+    other = '你访问的页面不存在，请检查链接是否正确。'

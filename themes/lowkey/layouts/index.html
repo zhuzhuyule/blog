@@ -1,28 +1,70 @@
 {{ define "main" }}
 
-{{ if and site.Params.enableCover (or (isset site.Params "coverimage") (isset site.Params "cover")) }}
-{{ $cover := "" }}
-{{ if isset site.Params "coverimage" }}
-    {{ $cover = site.Params.coverimage }}
-{{ else if isset site.Params "cover" }}
-    {{ $cover = site.Params.cover }}
-{{ end }}
-{{ if $cover }}
-<div class="relative w-full h-64 sm:h-80 mb-8 rounded-lg overflow-hidden">
-    <img 
-        src="{{ $cover | relURL }}" 
-        alt="Cover" 
-        class="w-full h-full object-cover"
-    />
-    <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
-</div>
-{{ end }}
+{{/* 文章列表 */}}
+{{ $pages := where site.RegularPages "Section" "posts" }}
+{{ $paginator := .Paginate $pages }}
+{{ if $paginator.Pages }}
+<section class="post-list">
+  {{ range $index, $page := $paginator.Pages }}
+  <article class="post-item post-animate" style="animation-delay: {{ mul $index 40 }}ms">
+    <a href="{{ $page.Permalink }}" class="post-title">{{ $page.Title }}</a>
+    <div class="post-meta">
+      <time datetime="{{ $page.Date.Format "2006-01-02" }}">{{ $page.Date.Format "2006年1月2日" }}</time>
+      <span>&middot;</span>
+      <span>{{ $page.ReadingTime }} 分钟阅读</span>
+      {{ with ($page.GetTerms "categories") }}
+      {{ range . }}
+      <a href="{{ .RelPermalink }}" class="post-tag">{{ .LinkTitle }}</a>
+      {{ end }}
+      {{ end }}
+    </div>
+    {{ $firstImage := index (findRE "<img[^>]+src=\"([^\"]+)\"" $page.Content) 0 }}
+    {{ with $firstImage }}
+    {{ $src := replaceRE "<img[^>]+src=\"([^\"]+)\".*" "$1" . }}
+    <a href="{{ $page.Permalink }}" class="post-cover">
+      <img src="{{ $src }}" alt="{{ $page.Title }}" loading="lazy" />
+    </a>
+    {{ end }}
+    <p class="post-summary">{{ $page.Summary | plainify }}</p>
+  </article>
+  {{ end }}
+</section>
+
+{{/* 分页 */}}
+{{ if gt $paginator.TotalPages 1 }}
+<nav class="flex justify-center items-center gap-4 mt-12 mb-8">
+  {{ if $paginator.HasPrev }}
+  <a href="{{ $paginator.Prev.URL }}" class="pagination-button">&larr; 上一页</a>
+  {{ end }}
+  <span class="text-sm text-gray-500 dark:text-gray-400">{{ $paginator.PageNumber }} / {{ $paginator.TotalPages }}</span>
+  {{ if $paginator.HasNext }}
+  <a href="{{ $paginator.Next.URL }}" class="pagination-button">下一页 &rarr;</a>
+  {{ end }}
+</nav>
 {{ end }}
 
-<div class="py-2 flex flex-col gap-1">
-  <h3 class="title-small">{{ .Title }}</h3>
-</div>
+{{ end }}
 
-<section>{{ .Content }} </section>
+{{/* 搜索组件 */}}
+<div id="search-overlay" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden" onclick="closeSearch()">
+  <div class="max-w-2xl mx-auto mt-20 px-4" onclick="event.stopPropagation()">
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+      <div class="flex items-center px-4 border-b border-gray-200 dark:border-gray-700">
+        <svg class="w-5 h-5 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+        </svg>
+        <input
+          id="search-input"
+          type="text"
+          placeholder="搜索文章..."
+          class="w-full px-3 py-4 bg-transparent text-gray-900 dark:text-gray-100 text-base outline-none placeholder-gray-400"
+          autocomplete="off"
+        />
+        <kbd class="hidden sm:inline-block px-2 py-0.5 text-xs text-gray-400 border border-gray-300 dark:border-gray-600 rounded">ESC</kbd>
+      </div>
+      <div id="search-results" class="max-h-96 overflow-y-auto" data-no-result="没有找到相关文章"></div>
+    </div>
+  </div>
+</div>
 
 {{ end }}

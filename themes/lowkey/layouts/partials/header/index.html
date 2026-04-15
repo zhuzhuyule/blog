@@ -1,8 +1,82 @@
-<header class="flex flex-col sm:flex-row items-center gap-5 sm:gap-10 pt-16 py-12">
-  {{ partial "header/avatar" . }}
-  
-  <div class="flex flex-col gap-5">
-    {{ partial "header/title" . }} 
+<header class="header-wrap">
+  {{/* 移动端：头像+名字+BIO 居中，左侧返回（非首页），右侧汉堡 */}}
+  <div class="sm:hidden flex flex-col items-center w-full relative py-2">
+    <a href="{{ .Site.BaseURL }}" class="flex flex-col items-center gap-1.5 no-underline">
+      {{ $avatar := resources.GetMatch .Site.Params.avatar }}
+      {{ $tiny := ($avatar.Fill "48x48 q90") }}
+      <div class="w-12 h-12 rounded-full overflow-hidden">
+        <img src="{{ $tiny.RelPermalink }}" width="48" height="48" alt="{{ .Site.Title }}" />
+      </div>
+      <span class="text-base font-bold text-gray-800 dark:text-gray-100">{{ .Site.Title }}</span>
+    </a>
+    {{ with site.Params.description }}
+    <span class="text-xs text-gray-400 dark:text-gray-500 mt-0.5">{{ . }}</span>
+    {{ end }}
+    {{/* 左侧返回按钮（非首页时显示） */}}
+    {{ if not .IsHome }}
+    <a href="javascript:history.length>1?history.back():location.href='/'" class="nav-icon-btn absolute left-0 top-1/2 -translate-y-1/2" aria-label="返回">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+      </svg>
+    </a>
+    {{ end }}
+    {{/* 右侧汉堡菜单 */}}
+    <button onclick="toggleMobileMenu()" class="nav-icon-btn absolute right-0 top-1/2 -translate-y-1/2" aria-label="菜单">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+      </svg>
+    </button>
+  </div>
+
+  {{/* 桌面端：左右布局 */}}
+  <div class="hidden sm:flex items-center gap-3">
+    {{ partial "header/avatar" . }}
+    <div class="flex flex-col">
+      {{ partial "header/title" . }}
+      {{ with site.Params.description }}
+      <span class="text-xs text-gray-400 dark:text-gray-500">{{ . }}</span>
+      {{ end }}
+    </div>
+  </div>
+  <div class="hidden sm:block">
     {{ partial "header/nav" . }}
   </div>
 </header>
+
+{{/* 移动端侧边栏 - 无头像 */}}
+<div id="mobile-overlay" class="mobile-overlay" onclick="toggleMobileMenu()"></div>
+<aside id="mobile-menu" class="mobile-menu">
+  <div class="flex flex-col px-6 pt-6 pb-4">
+    {{ $currentPage := . }}
+    {{ range site.Menus.main }}
+    {{- $menu_item_url := (cond (strings.HasSuffix .URL "/") .URL (printf "%s/" .URL) ) | absLangURL }}
+    {{- $page_url := $currentPage.Permalink | absLangURL }}
+    {{- $isHome := and (eq .Identifier "home") $currentPage.IsHome }}
+    {{ if not $isHome }}
+    <a href="{{ .URL }}" onclick="toggleMobileMenu()"
+      class="mobile-menu-item {{ if eq $menu_item_url $page_url }}active{{ end }}">
+      {{ .Name }}
+    </a>
+    {{ end }}
+    {{ end }}
+  </div>
+  <hr class="mx-6 border-gray-200 dark:border-gray-700">
+  <div class="flex flex-col px-6 py-4">
+    <button onclick="mobileSearch()" class="mobile-menu-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+      </svg>
+      搜索
+    </button>
+    <button onclick="cycleTheme()" class="mobile-menu-item">
+      <span class="theme-state-icon" data-theme="light">{{ partial "utils/icon" "sun" }}</span>
+      <span class="theme-state-icon" data-theme="dark">{{ partial "utils/icon" "moon" }}</span>
+      <span class="theme-state-icon" data-theme="auto">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+        </svg>
+      </span>
+      主题
+    </button>
+  </div>
+</aside>

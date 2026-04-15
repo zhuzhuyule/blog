@@ -1,49 +1,17 @@
 [[main]]
     identifier = "home"
-    name = "Home"
+    name = "首页"
     url = "/"
     weight = 1
 
 [[main]]
     identifier = "about"
-    name = "About me"
+    name = "关于"
     url = "/about"
     weight = 2
 
 [[main]]
     identifier = "categories"
-    name = "Categories"
+    name = "分类"
     url = "/categories"
-    weight = 3
-
-[[main]]
-    identifier = "tags"
-    name = "Tags"
-    url = "/tags"
-    weight = 4
-
-[[main]]
-    identifier = "donate"
-    name = "Donate"
-    url = "https://ko-fi.com/nixentric"
-    weight = 5
-    
-# Social Media Configuration
-
-[[social]]
-    identifier = "twitter"
-    name = "Twitter"
-    url = "#"
-    weight = 1
-
-[[social]]
-    identifier = "instagram"
-    name = "Instagram"
-    url = "#"
-    weight = 2
-
-[[social]]
-    identifier = "github"
-    name = "GitHub"
-    url = "#"
     weight = 3

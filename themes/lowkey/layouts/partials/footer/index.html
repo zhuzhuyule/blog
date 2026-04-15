@@ -1,7 +1,6 @@
-<footer class="pt-5 pb-10 grid gap-3 sm:grid-cols-2">
-    {{ partial "footer/copyright" . }}
-    <div class="order-1 sm:order-2">
-        <ul class="flex sm:justify-end gap-4">
+<footer class="py-8 flex flex-col items-center gap-4">
+    <div>
+        <ul class="flex justify-center gap-4">
             {{ with site.Params.social.github }}
             <li>
                 <a href="{{ . }}" target="_blank" rel="me noopener noreferrer" aria-label="GitHub">
@@ -32,4 +31,5 @@
             {{ end }}
         </ul>
     </div>
+    {{ partial "footer/copyright" . }}
 </footer>
