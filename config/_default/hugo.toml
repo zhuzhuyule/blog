@@ -23,6 +23,10 @@ paginate = 5
     noHl = false
     style = 'dracula'
     tabWidth = 4
+  [markup.tableOfContents]
+    startLevel = 2
+    endLevel = 4
+    ordered = false
 
 [outputs]
   home = ["HTML", "RSS", "JSON"]

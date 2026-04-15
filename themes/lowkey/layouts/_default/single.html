@@ -1,51 +1,50 @@
 {{ define "main" }}
 
-{{/* 桌面端返回链接 */}}
-<a href="javascript:history.length>1?history.back():location.href='/'" class="back-link hidden sm:inline-flex">
-  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-  </svg>
-  返回
-</a>
+<div class="article-layout">
+  <article class="article-content flex flex-col gap-10">
+    <header class="flex flex-col gap-2">
+      <h2 class="title-large">{{ .Title }}</h2>
 
-<article class="flex flex-col gap-10">
-  <header class="flex flex-col gap-2">
-    <h2 class="title-large">{{ .Title }}</h2>
+      <div class="meta">
+        <time datetime="{{ .PublishDate }}" title='{{ .PublishDate.Format "Mon, Jan 2, 2006, 3:04 PM MST" }}'>
+          {{ .PublishDate.Format "02/01/2006" }} - {{ printf (i18n "estimatedReadingTime") .ReadingTime }}
+        </time>
 
-    <div class="meta">
-      {{/* Publish date */}}
-      <time datetime="{{ .PublishDate }}" title='{{ .PublishDate.Format "Mon, Jan 2, 2006, 3:04 PM MST" }}'>
-        {{ .PublishDate.Format "02/01/2006" }} - {{ printf (i18n "estimatedReadingTime") .ReadingTime }}
-      </time>
+        {{ with (.GetTerms "categories") }} —
+          {{ range . }}
+            <a class="categories" href="{{ .RelPermalink }}" alt="{{ .LinkTitle }}">
+              {{ .LinkTitle }}
+            </a>
+          {{ end }}
+        {{ end }}
+      </div>
+    </header>
 
-      {{/* Categories */}} 
-      {{ with (.GetTerms "categories") }} — 
+    <section>{{ .Content | emojify }}</section>
+
+    {{ partial "single/comments/index" . }}
+
+    <footer>
+      {{ with (.GetTerms "tags") }}
+        <div class="pb-14 taxonomy-list tags-list">
         {{ range . }}
-          <a class="categories" href="{{ .RelPermalink }}" alt="{{ .LinkTitle }}">
+          <a href="{{ .RelPermalink }}" alt="{{ .LinkTitle }}">
             {{ .LinkTitle }}
           </a>
-        {{ end }} 
+        {{ end }}
+        </div>
       {{ end }}
-    </div>
-  </header>
+    </footer>
+  </article>
 
-  {{ partial "single/table-of-contents" . }}
-
-  <section>{{ .Content | emojify }}</section>
-
-  {{ partial "single/comments/index" . }}
-
-  <footer>
-    {{ with (.GetTerms "tags") }}
-      <div class="pb-14 taxonomy-list tags-list">
-      {{ range . }}
-        <a href="{{ .RelPermalink }}" alt="{{ .LinkTitle }}">
-          {{ .LinkTitle }}
-        </a>
-      {{ end }}
-      </div>
-    {{ end }}
-  </footer>
-</article>
+  {{ if .TableOfContents }}
+  <aside class="toc-sidebar">
+    <nav class="toc-nav" id="toc-nav">
+      <h3 class="toc-heading">目录</h3>
+      {{ .TableOfContents }}
+    </nav>
+  </aside>
+  {{ end }}
+</div>
 
 {{ end }}

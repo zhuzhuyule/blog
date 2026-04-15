@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+html {
+  overflow-x: clip;
+}
+
 
 @layer base {
   /* inter-100 - latin */
@@ -178,10 +182,7 @@
     opacity: 1;
   }
 
-  /* 返回链接 */
-  .back-link {
-    @apply inline-flex items-center gap-1 text-sm text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 no-underline font-normal mt-4 mb-4 transition-colors;
-  }
+
 
   .site-container {
     max-width: var(--site-width, 1000px);
@@ -446,20 +447,84 @@
     @apply bg-red-100 border-red-500 text-red-900;
   }
 
-  #content .table-of-contents {
-    @apply bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 p-4 border dark:border-gray-700 rounded-lg;
+  /* 文章 + TOC 两栏布局 */
+  .article-layout {
+    @apply pt-8;
   }
 
-  #content .table-of-contents #TableOfContents ul {
-    @apply list-decimal list-inside ml-4;
+  /* TOC 侧边栏 —— 默认隐藏 */
+  .toc-sidebar {
+    @apply hidden;
   }
 
-  #content .table-of-contents #TableOfContents ul li {
-    @apply my-2 text-base;
+  @media (min-width: 1280px) {
+    .article-layout {
+      display: flex;
+      align-items: flex-start;
+    }
+
+    .article-content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .toc-sidebar {
+      display: block;
+      flex-shrink: 0;
+      width: 200px;
+      margin-left: 24px;
+      margin-right: -224px;
+      position: sticky;
+      top: 24px;
+      max-height: calc(100vh - 48px);
+      overflow-y: auto;
+    }
   }
 
-  #content .table-of-contents #TableOfContents ul li a {
-    @apply font-normal no-underline text-gray-700 dark:text-gray-300 hover:underline hover:text-emerald-600 dark:hover:text-emerald-200;
+  .toc-nav {
+    @apply text-sm;
+  }
+
+  .toc-heading {
+    @apply text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500 mb-3 pb-0 pt-0;
+  }
+
+  .toc-nav #TableOfContents > ul {
+    @apply list-none m-0 p-0;
+    border-left: 2px solid theme('colors.gray.200');
+  }
+
+  :is(.dark) .toc-nav #TableOfContents > ul {
+    border-left-color: theme('colors.gray.700');
+  }
+
+  .toc-nav #TableOfContents ul {
+    @apply list-none m-0 p-0;
+  }
+
+  .toc-nav #TableOfContents ul ul {
+    @apply pl-0;
+  }
+
+  .toc-nav #TableOfContents li {
+    @apply my-0;
+  }
+
+  .toc-nav #TableOfContents a {
+    @apply block py-1.5 pl-3 no-underline transition-all duration-200 text-[13px] leading-snug font-normal;
+    @apply text-gray-400 dark:text-gray-500;
+    @apply hover:text-gray-700 dark:hover:text-gray-300;
+    margin-left: -2px;
+    border-left: 2px solid transparent;
+  }
+
+  .toc-nav #TableOfContents ul ul a {
+    @apply pl-6;
+  }
+
+  .toc-nav #TableOfContents a.toc-active {
+    @apply text-emerald-600 dark:text-emerald-400;
+    border-left-color: theme('colors.emerald.500');
   }
 
   #content .pagination-button {

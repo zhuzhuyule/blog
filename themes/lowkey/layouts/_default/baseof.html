@@ -181,6 +181,36 @@
         });
       });
 
+      /* TOC 滚动高亮 */
+      var tocNav = document.getElementById('toc-nav');
+      if (tocNav) {
+        var tocLinks = tocNav.querySelectorAll('#TableOfContents a');
+        var headings = [];
+        tocLinks.forEach(function(link) {
+          var id = decodeURIComponent(link.getAttribute('href').slice(1));
+          var el = document.getElementById(id);
+          if (el) headings.push({ el: el, link: link });
+        });
+        if (headings.length) {
+          function updateTocActive() {
+            var scrollY = window.scrollY;
+            var viewH = window.innerHeight;
+            var current = null;
+            for (var i = headings.length - 1; i >= 0; i--) {
+              if (headings[i].el.getBoundingClientRect().top <= viewH * 0.2) {
+                current = headings[i];
+                break;
+              }
+            }
+            if (!current) current = headings[0];
+            tocLinks.forEach(function(l) { l.classList.remove('toc-active'); });
+            if (current) current.link.classList.add('toc-active');
+          }
+          window.addEventListener('scroll', updateTocActive, { passive: true });
+          updateTocActive();
+        }
+      }
+
       /* 回到顶部按钮显隐 */
       var topBtn = document.getElementById('back-to-top');
       if (topBtn) {
