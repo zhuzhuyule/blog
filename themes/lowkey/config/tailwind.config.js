@@ -1,16 +1,16 @@
 const path = require('path');
 
-// When deploying to production, set the base directory to your Hugo project's root directory.
-const baseDir = path.join(__dirname, '..');
+// 项目根目录（向上三级：themes/lowkey/config → 根）
+const rootDir = path.join(__dirname, '..', '..', '..');
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   darkMode: 'class',
   content: [
-    `${baseDir}/themes/**/layouts/**/*.html`,
-    `${baseDir}/layouts/**/*.html`,
-    `${baseDir}/content/**/*.html`,
-    `${baseDir}/content/**/*.md`,
+    `${rootDir}/themes/**/layouts/**/*.html`,
+    `${rootDir}/layouts/**/*.html`,
+    `${rootDir}/content/**/*.html`,
+    `${rootDir}/content/**/*.md`,
   ],
   theme: {
     extend: {
@@ -20,6 +20,4 @@ module.exports = {
     },
   },
   plugins: [],
-  variants: ['group-hover'],
-}
-
+};
