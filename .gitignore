@@ -6,3 +6,4 @@ public/
 .dev.vars
 .env.blog
 .wrangler/
+.playwright-cli/
