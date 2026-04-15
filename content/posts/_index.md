@@ -1,5 +1,3 @@
 ---
-title: "Post"
-header: "Latest Posts" # Optional
+title: "文章"
 ---
-See What I’ve Written Lately
