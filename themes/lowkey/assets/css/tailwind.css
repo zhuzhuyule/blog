@@ -6,6 +6,45 @@ html {
   overflow-x: clip;
 }
 
+/* 原生 CSS：清除 Goldmark 给 figure 包裹的多余 p 标签 */
+p:has(> figure) {
+  display: block !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  line-height: 0 !important;
+  font-size: 0 !important;
+}
+
+section > p:first-child {
+  margin-bottom: 0 !important;
+}
+
+/* 图片灯箱 */
+.img-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(4px);
+  cursor: zoom-out;
+  animation: lightbox-in 0.2s ease;
+}
+
+.img-lightbox img {
+  max-width: 90vw;
+  max-height: 90vh;
+  border-radius: 8px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+@keyframes lightbox-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
 
 @layer base {
   /* inter-100 - latin */
@@ -112,7 +151,14 @@ html {
   }
 
   body {
-    @apply bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 text-lg text-justify;
+    @apply bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 text-base text-justify;
+    font-size: 1rem;
+  }
+
+  @media (min-width: 640px) {
+    body {
+      font-size: 1.1rem;
+    }
   }
 
   /* 自定义滚动条 */
@@ -193,51 +239,26 @@ html {
   }
   
   h1, h2, h3, h4, h5, h6 {
-    @apply font-bold text-gray-900 dark:text-gray-300 mb-4;
+    @apply font-bold text-gray-900 dark:text-gray-300 mb-3 sm:mb-4;
   }
 
-  h2 {
-    @apply mt-12;
-  }
+  h2 { @apply mt-8 sm:mt-12; }
+  h3 { @apply mt-6 sm:mt-8; }
+  h4, h5, h6 { @apply mt-4 sm:mt-6; }
 
-  h3 {
-    @apply mt-8;
-  }
-
-  h4, h5, h6 {
-    @apply mt-6;
-  }
-  
-  h1 {
-    @apply text-4xl leading-10;
-  }
-  
-  h2 {
-    @apply text-3xl leading-10;
-  }
-  
-  h3 {
-    @apply text-2xl;
-  }
-  
-  h4 {
-    @apply text-xl;
-  }
-  
-  h5 {
-    @apply text-lg;
-  }
-  
-  h6 {
-    @apply text-base;
-  }
+  h1 { @apply text-2xl sm:text-4xl leading-snug sm:leading-10; }
+  h2 { @apply text-xl sm:text-3xl leading-snug sm:leading-10; }
+  h3 { @apply text-lg sm:text-2xl; }
+  h4 { @apply text-base sm:text-xl; }
+  h5 { @apply text-base sm:text-lg; }
+  h6 { @apply text-sm sm:text-base; }
   
   hr {
     @apply border-gray-200 dark:border-gray-700;
   }
 
   p, hr, pre, dl {
-    @apply mb-5 text-justify;
+    @apply mb-3 sm:mb-5 text-justify;
   }
   
   article > h1 {
@@ -257,11 +278,49 @@ html {
   }
   
   figure {
-    @apply mb-5;
+    @apply mb-3 sm:mb-5 mt-0;
   }
 
   figure img {
-    @apply rounded-lg;
+    @apply rounded-lg cursor-zoom-in;
+  }
+
+  /* 标题锚点链接 */
+  .heading-with-anchor {
+    @apply relative;
+  }
+
+  .heading-anchor {
+    @apply no-underline opacity-0 transition-opacity duration-200 inline-flex items-center ml-2 align-middle;
+  }
+
+  .heading-anchor svg {
+    width: 0.65em;
+    height: 0.65em;
+    @apply text-gray-300 dark:text-gray-600;
+  }
+
+  .heading-with-anchor:hover .heading-anchor {
+    @apply opacity-100;
+  }
+
+  .heading-anchor:hover svg {
+    @apply text-emerald-500;
+  }
+
+  /* 桌面端：锚点显示在容器左侧外 */
+  @media (min-width: 640px) {
+    .heading-anchor {
+      @apply absolute ml-0;
+      right: 100%;
+      margin-right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+  }
+
+  section > :first-child {
+    @apply mt-0;
   }
 
   figcaption {
@@ -269,7 +328,7 @@ html {
   }
   
   blockquote {
-    @apply text-xl text-gray-500 dark:text-gray-400 italic border-l-4 border-gray-300 dark:border-gray-700 pl-4 mb-5;
+    @apply text-base sm:text-xl text-gray-500 dark:text-gray-400 italic border-l-4 border-gray-300 dark:border-gray-700 pl-4 mb-3 sm:mb-5;
   }
   
   ul, ol {
@@ -338,8 +397,11 @@ html {
   }
 
   .mobile-menu {
-    @apply fixed top-0 right-0 h-full z-50 bg-white dark:bg-gray-900 border-l border-gray-200 dark:border-gray-800;
-    width: 240px;
+    @apply fixed top-0 right-0 z-50 bg-white dark:bg-gray-900 border-l border-gray-200 dark:border-gray-800;
+    width: 260px;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
     transform: translateX(100%);
     transition: transform 0.25s ease;
   }
@@ -358,6 +420,22 @@ html {
 
   .mobile-menu-item svg {
     @apply w-4 h-4 shrink-0;
+  }
+
+  /* 移动端横向 chip 按钮 */
+  .mobile-chip {
+    @apply inline-flex items-center gap-1.5 text-sm font-medium px-3 py-1.5 rounded-full no-underline cursor-pointer transition-colors;
+    @apply bg-gray-100 text-gray-600 hover:bg-gray-200;
+    @apply dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700;
+  }
+
+  .mobile-chip.active {
+    @apply bg-emerald-50 text-emerald-700;
+    @apply dark:bg-emerald-900/30 dark:text-emerald-300;
+  }
+
+  .mobile-chip svg {
+    @apply w-3.5 h-3.5 shrink-0;
   }
 
   .nav-icon-btn {
@@ -465,7 +543,7 @@ html {
 
   /* 文章 + TOC 两栏布局 */
   .article-layout {
-    @apply pt-8;
+    @apply pt-0 sm:pt-8;
   }
 
   /* TOC 侧边栏 —— 默认隐藏 */
@@ -543,6 +621,29 @@ html {
     border-left-color: theme('colors.emerald.500');
   }
 
+  /* 移动端 TOC 列表 */
+  .mobile-toc-list #TableOfContents ul {
+    @apply list-none m-0 p-0;
+  }
+
+  .mobile-toc-list #TableOfContents ul ul {
+    @apply pl-4;
+  }
+
+  .mobile-toc-list #TableOfContents li {
+    @apply my-0;
+  }
+
+  /* h2 级别 */
+  .mobile-toc-list #TableOfContents > ul > li > a {
+    @apply block py-1.5 no-underline text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors;
+  }
+
+  /* h3 及更深层级 */
+  .mobile-toc-list #TableOfContents a {
+    @apply block py-1 no-underline text-xs text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors;
+  }
+
   #content .pagination-button {
     @apply no-underline inline-flex items-center gap-2 px-3 py-2 border border-gray-300 dark:border-gray-700 text-sm rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100;
   }
@@ -573,7 +674,7 @@ html {
   }
 
   .title-large {
-    @apply text-4xl leading-snug font-bold text-gray-900 dark:text-gray-300 mb-0 pt-0;
+    @apply text-2xl sm:text-4xl leading-snug font-bold text-gray-900 dark:text-gray-300 mb-0 mt-0 pt-0;
   }
 
   .title-small {

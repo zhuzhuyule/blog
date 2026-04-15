@@ -12,14 +12,7 @@
     {{ with site.Params.description }}
     <span class="text-xs text-gray-400 dark:text-gray-500 mt-0.5">{{ . }}</span>
     {{ end }}
-    {{/* 左侧返回按钮（非首页时显示） */}}
-    {{ if not .IsHome }}
-    <a href="javascript:history.length>1?history.back():location.href='/'" class="nav-icon-btn absolute left-0 top-1/2 -translate-y-1/2" aria-label="返回">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-      </svg>
-    </a>
-    {{ end }}
+    {{/* 移动端返回按钮已移除，通过导航菜单中的"首页"链接回首页 */}}
     {{/* 右侧汉堡菜单 */}}
     <button onclick="toggleMobileMenu()" class="nav-icon-btn absolute right-0 top-1/2 -translate-y-1/2" aria-label="菜单">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -46,7 +39,8 @@
 {{/* 移动端侧边栏 - 无头像 */}}
 <div id="mobile-overlay" class="mobile-overlay" onclick="toggleMobileMenu()"></div>
 <aside id="mobile-menu" class="mobile-menu">
-  <div class="flex flex-col px-6 pt-6 pb-4">
+  {{/* 第一行：导航（3个） */}}
+  <div class="flex justify-center gap-2 px-4 pt-5 pb-1">
     {{ $currentPage := . }}
     {{ range site.Menus.main }}
     {{- $menu_item_url := (cond (strings.HasSuffix .URL "/") .URL (printf "%s/" .URL) ) | absLangURL }}
@@ -54,29 +48,37 @@
     {{- $isHome := and (eq .Identifier "home") $currentPage.IsHome }}
     {{ if not $isHome }}
     <a href="{{ .URL }}" onclick="toggleMobileMenu()"
-      class="mobile-menu-item {{ if eq $menu_item_url $page_url }}active{{ end }}">
+      class="mobile-chip {{ if eq $menu_item_url $page_url }}active{{ end }}">
       {{ .Name }}
     </a>
     {{ end }}
     {{ end }}
   </div>
-  <hr class="mx-6 border-gray-200 dark:border-gray-700">
-  <div class="flex flex-col px-6 py-4">
-    <button onclick="mobileSearch()" class="mobile-menu-item">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+  {{/* 第二行：搜索 + 主题（2个） */}}
+  <div class="flex justify-center gap-2 px-4 pb-3">
+    <button onclick="mobileSearch()" class="mobile-chip" aria-label="搜索">
+      <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
       </svg>
       搜索
     </button>
-    <button onclick="cycleTheme()" class="mobile-menu-item">
+    <button onclick="cycleTheme()" class="mobile-chip" aria-label="主题">
       <span class="theme-state-icon" data-theme="light">{{ partial "utils/icon" "sun" }}</span>
       <span class="theme-state-icon" data-theme="dark">{{ partial "utils/icon" "moon" }}</span>
       <span class="theme-state-icon" data-theme="auto">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
         </svg>
       </span>
       主题
     </button>
+  </div>
+  {{/* TOC 区域：flex-1 填满剩余空间，内容可滚动 */}}
+  <div id="mobile-toc" class="hidden flex-1 min-h-0 flex flex-col">
+    <hr class="mx-4 border-gray-200 dark:border-gray-700">
+    <div class="px-4 py-3 flex-1 overflow-y-auto">
+      <h4 class="text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500 mb-2">目录</h4>
+      <div id="mobile-toc-content" class="mobile-toc-list"></div>
+    </div>
   </div>
 </aside>

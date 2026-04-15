@@ -1,0 +1,9 @@
+<h{{ .Level }} id="{{ .Anchor }}" class="heading-with-anchor">
+  {{ .Text }}
+  <a href="#{{ .Anchor }}" class="heading-anchor" aria-hidden="true" onclick="navigator.clipboard.writeText(location.origin+location.pathname+'#{{ .Anchor }}')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/>
+      <path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/>
+    </svg>
+  </a>
+</h{{ .Level }}>

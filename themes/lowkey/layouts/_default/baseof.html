@@ -36,7 +36,9 @@
       overlay.classList.toggle('open');
       if (iconOpen) iconOpen.classList.toggle('hidden');
       if (iconClose) iconClose.classList.toggle('hidden');
-      document.body.style.overflow = isOpen ? '' : 'hidden';
+      var lock = isOpen ? '' : 'hidden';
+      document.body.style.overflow = lock;
+      document.documentElement.style.overflow = lock;
     }
 
     function mobileSearch() {
@@ -152,6 +154,29 @@
     document.addEventListener('DOMContentLoaded', function() {
       applyTheme(getStoredTheme());
       applyWidth(getPreferredWidth());
+
+      /* 移动端 TOC 注入侧边栏 */
+      var tocSource = document.getElementById('mobile-toc-source');
+      var tocTarget = document.getElementById('mobile-toc-content');
+      var tocWrap = document.getElementById('mobile-toc');
+      if (tocSource && tocTarget && tocWrap) {
+        tocTarget.innerHTML = tocSource.innerHTML;
+        tocWrap.classList.remove('hidden');
+        tocTarget.querySelectorAll('a').forEach(function(a) {
+          a.addEventListener('click', function() { toggleMobileMenu(); });
+        });
+      }
+
+      /* 图片点击放大 */
+      document.querySelectorAll('figure img').forEach(function(img) {
+        img.addEventListener('click', function() {
+          var overlay = document.createElement('div');
+          overlay.className = 'img-lightbox';
+          overlay.innerHTML = '<img src="' + img.src + '" />';
+          overlay.addEventListener('click', function() { overlay.remove(); });
+          document.body.appendChild(overlay);
+        });
+      });
 
       /* 封面图：自然高度不足屏幕一半则隐藏 */
       document.querySelectorAll('.post-cover img').forEach(function(img) {

@@ -1,7 +1,7 @@
 {{ define "main" }}
 
 <div class="article-layout">
-  <article class="article-content flex flex-col gap-10">
+  <article class="article-content flex flex-col gap-4 sm:gap-8">
     <header class="flex flex-col gap-2">
       <h2 class="title-large">{{ .Title }}</h2>
 
@@ -43,6 +43,8 @@
       {{ .TableOfContents }}
     </nav>
   </aside>
+  {{/* 移动端 TOC 数据源，JS 注入到侧边栏 */}}
+  <div id="mobile-toc-source" class="hidden">{{ .TableOfContents }}</div>
   {{ end }}
 </div>
 

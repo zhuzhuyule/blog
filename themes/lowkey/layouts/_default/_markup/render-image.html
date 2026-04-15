@@ -1,41 +1,23 @@
 {{- $src := .Destination -}}
 {{- $alt := .Text -}}
 {{- $title := .Title -}}
-
-{{- /* 尝试获取 Page Bundle 中的图片资源 */ -}}
 {{- $img := .Page.Resources.GetMatch $src -}}
-
 {{- if $img -}}
-  {{- /* 有资源：Hugo 图片处理，压缩 + 限宽 */ -}}
-  {{- $maxWidth := 1200 -}}
-  {{- $quality := 85 -}}
-
-  {{- if gt $img.Width $maxWidth -}}
-    {{- $img = $img.Resize (printf "%dx q%d" $maxWidth $quality) -}}
-  {{- else -}}
-    {{- $img = $img.Process (printf "q%d" $quality) -}}
-  {{- end -}}
-
-  {{- /* 生成小尺寸用于 srcset */ -}}
-  {{- $small := $img -}}
-  {{- if gt $img.Width 600 -}}
-    {{- $small = $img.Resize (printf "600x q%d" $quality) -}}
-  {{- end -}}
-
-  <figure>
-    <img
-      src="{{ $img.RelPermalink }}"
-      srcset="{{ $small.RelPermalink }} 600w, {{ $img.RelPermalink }} {{ $img.Width }}w"
-      sizes="(max-width: 640px) 100vw, (max-width: 1200px) 80vw, 1200px"
-      alt="{{ $alt }}"
-      width="{{ $img.Width }}"
-      height="{{ $img.Height }}"
-      loading="lazy"
-      {{ with $title }}title="{{ . }}"{{ end }}
-    />
-    {{- with $title -}}<figcaption>{{ . }}</figcaption>{{- end -}}
-  </figure>
+{{- $maxWidth := 1200 -}}
+{{- $quality := 85 -}}
+{{- if gt $img.Width $maxWidth -}}
+{{- $img = $img.Resize (printf "%dx q%d" $maxWidth $quality) -}}
 {{- else -}}
-  {{- /* 外部 URL 或找不到资源：原样输出 */ -}}
-  <img src="{{ $src }}" alt="{{ $alt }}" loading="lazy" {{ with $title }}title="{{ . }}"{{ end }} />
+{{- $img = $img.Process (printf "q%d" $quality) -}}
+{{- end -}}
+{{- $small := $img -}}
+{{- if gt $img.Width 600 -}}
+{{- $small = $img.Resize (printf "600x q%d" $quality) -}}
+{{- end -}}
+<figure>
+<img src="{{ $img.RelPermalink }}" srcset="{{ $small.RelPermalink }} 600w, {{ $img.RelPermalink }} {{ $img.Width }}w" sizes="(max-width: 640px) 100vw, (max-width: 1200px) 80vw, 1200px" alt="{{ $alt }}" width="{{ $img.Width }}" height="{{ $img.Height }}" loading="lazy"{{ with $title }} title="{{ . }}"{{ end }} />
+{{- with $title }}<figcaption>{{ . }}</figcaption>{{ end -}}
+</figure>
+{{- else -}}
+<img src="{{ $src }}" alt="{{ $alt }}" loading="lazy"{{ with $title }} title="{{ . }}"{{ end }} />
 {{- end -}}

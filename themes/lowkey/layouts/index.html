@@ -27,7 +27,17 @@
       <img src="{{ $src }}" alt="{{ $page.Title }}" loading="lazy" />
     </a>
     {{ end }}
-    <p class="post-summary">{{ $page.Summary | plainify }}</p>
+    {{/* 智能摘要：提取第一个足够长的 <p> 段落，跳过 figcaption 等短文本 */}}
+    {{ $summary := "" }}
+    {{ $paragraphs := findRE "<p>(.+?)</p>" $page.Content }}
+    {{ range $paragraphs }}
+      {{ $text := . | plainify }}
+      {{ if and (not $summary) (gt (len $text) 50) }}
+        {{ $summary = $text }}
+      {{ end }}
+    {{ end }}
+    {{ if not $summary }}{{ $summary = $page.Summary | plainify }}{{ end }}
+    <p class="post-summary">{{ $summary }}</p>
   </article>
   {{ end }}
 </section>
