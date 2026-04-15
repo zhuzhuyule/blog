@@ -2,7 +2,8 @@ isSinglePage = true
 
 description = "代码 · 科技 · 折腾"
 
-avatar = "img/profile-picture.jpg"
+avatar = "img/profile-picture.png"
+# 头像放在 assets/img/ 目录下（Hugo resources.GetMatch 需要）
 
 favicon = "icons/favicon.ico"
 
