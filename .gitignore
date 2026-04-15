@@ -2,6 +2,7 @@
 node_modules/
 public/
 .hugo_build.lock
-*.log.dev.vars
+*.log
+.dev.vars
 .env.blog
 .wrangler/
