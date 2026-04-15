@@ -16,19 +16,58 @@ user_invocable: true
 # 主 API 配置
 IMAGE_API_PROVIDER=        # openai / gemini / custom
 IMAGE_API_KEY=             # API Key
-IMAGE_API_BASE_URL=        # API Base URL（如 https://api.openai.com/v1）
-IMAGE_API_MODEL=           # 模型名（如 dall-e-3 / imagen-3.0-generate-002）
+IMAGE_API_BASE_URL=        # Base URL（不带 /v1，脚本自动拼接路径）
+IMAGE_API_MODEL=           # 模型名
 
 # 备用 API（主 API 失败时自动切换）
-IMAGE_FALLBACK_PROVIDER=   # openai / gemini / custom
-IMAGE_FALLBACK_KEY=        # 备用 API Key
-IMAGE_FALLBACK_BASE_URL=   # 备用 Base URL
-IMAGE_FALLBACK_MODEL=      # 备用模型名
+IMAGE_FALLBACK_PROVIDER=
+IMAGE_FALLBACK_KEY=
+IMAGE_FALLBACK_BASE_URL=
+IMAGE_FALLBACK_MODEL=
 
 # 通用设置
 IMAGE_DEFAULT_STYLE=       # 默认风格：tech-dark / minimal / illustration
 IMAGE_DEFAULT_SIZE=        # 默认尺寸：1792x1024（OpenAI）/ 16:9（Gemini）
 ```
+
+#### 配置示例
+
+**Google Gemini（直连或代理）：**
+```env
+IMAGE_API_PROVIDER=gemini
+IMAGE_API_KEY=your-api-key
+IMAGE_API_BASE_URL=https://generativelanguage.googleapis.com
+IMAGE_API_MODEL=models/gemini-2.0-flash-exp
+```
+调用方式：`POST {BASE_URL}/v1beta/{MODEL}:generateContent?key={KEY}`
+请求体使用 Gemini `generateContent` 格式，返回 base64 图片。
+
+**Google Gemini（代理服务器）：**
+```env
+IMAGE_API_PROVIDER=gemini
+IMAGE_API_KEY=your-api-key
+IMAGE_API_BASE_URL=http://your-proxy:3001/proxy/gemini
+IMAGE_API_MODEL=models/gemini-2.0-flash-exp
+```
+代理模式下 Base URL 替换为代理地址，路径拼接方式不变。
+
+**OpenAI DALL-E：**
+```env
+IMAGE_API_PROVIDER=openai
+IMAGE_API_KEY=sk-xxxxx
+IMAGE_API_BASE_URL=https://api.openai.com
+IMAGE_API_MODEL=dall-e-3
+```
+调用方式：`POST {BASE_URL}/v1/images/generations`，Header 带 `Authorization: Bearer {KEY}`。
+
+**自定义（兼容 OpenAI 格式的第三方）：**
+```env
+IMAGE_API_PROVIDER=custom
+IMAGE_API_KEY=your-key
+IMAGE_API_BASE_URL=https://your-service.com
+IMAGE_API_MODEL=your-model
+```
+使用与 OpenAI 相同的请求格式。
 
 同时确认 `.gitignore` 中包含 `.env.blog`。
 
@@ -145,13 +184,13 @@ frontmatter 设置 `math: true`，行内 `$E = mc^2$`，块级 `$$\sum_{i=1}^{n}
 
 #### API 调用方式
 
-| Provider | Base URL | Model | 说明 |
-|----------|----------|-------|------|
-| openai | `https://api.openai.com/v1` | `dall-e-3` | POST `/images/generations` |
-| gemini | `https://generativelanguage.googleapis.com` | `imagen-3.0-generate-002` | Imagen API |
-| custom | 用户自定义 | 用户自定义 | 兼容 OpenAI 格式的第三方 API |
+| Provider | 请求路径 | 认证方式 | 请求格式 |
+|----------|---------|---------|---------|
+| gemini | `{BASE_URL}/v1beta/{MODEL}:generateContent?key={KEY}` | URL 参数 | Gemini generateContent |
+| openai | `{BASE_URL}/v1/images/generations` | Header `Bearer {KEY}` | OpenAI Images API |
+| custom | `{BASE_URL}/v1/images/generations` | Header `Bearer {KEY}` | 同 OpenAI |
 
-`custom` 模式使用与 OpenAI 相同的请求格式，方便接入 Midjourney API、Stability AI 等第三方服务。
+**注意**：Base URL 不要带 `/v1` 后缀，脚本会根据 provider 自动拼接正确路径。
 
 如果未配置任何 API，直接输出 prompt 文案供用户手动生成。
 
