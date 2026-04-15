@@ -4,7 +4,7 @@
   {{- if $i }},{{ end }}
   {
     "title": {{ $p.Title | jsonify }},
-    "url": {{ $p.Permalink | jsonify }},
+    "url": {{ $p.RelPermalink | jsonify }},
     "date": {{ $p.Date.Format "2006年1月2日" | jsonify }},
     "summary": {{ ($p.Description | default ($p.Summary | plainify | truncate 150)) | jsonify }}
   }

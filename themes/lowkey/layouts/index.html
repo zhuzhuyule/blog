@@ -7,21 +7,23 @@
 <section class="post-list">
   {{ range $index, $page := $paginator.Pages }}
   <article class="post-item post-animate" style="animation-delay: {{ mul $index 40 }}ms">
-    <a href="{{ $page.Permalink }}" class="post-title">{{ $page.Title }}</a>
+    <a href="{{ $page.RelPermalink }}" class="post-title">{{ $page.Title }}</a>
     <div class="post-meta">
       <time datetime="{{ $page.Date.Format "2006-01-02" }}">{{ $page.Date.Format "2006年1月2日" }}</time>
       <span>&middot;</span>
       <span>{{ $page.ReadingTime }} 分钟阅读</span>
       {{ with ($page.GetTerms "categories") }}
       {{ range . }}
+      <span>&middot;</span>
       <a href="{{ .RelPermalink }}" class="post-tag">{{ .LinkTitle }}</a>
       {{ end }}
       {{ end }}
+      <span class="page-stats" data-path="{{ $page.RelPermalink }}"></span>
     </div>
     {{ $firstImage := index (findRE "<img[^>]+src=\"([^\"]+)\"" $page.Content) 0 }}
     {{ with $firstImage }}
     {{ $src := replaceRE "<img[^>]+src=\"([^\"]+)\".*" "$1" . }}
-    <a href="{{ $page.Permalink }}" class="post-cover">
+    <a href="{{ $page.RelPermalink }}" class="post-cover">
       <img src="{{ $src }}" alt="{{ $page.Title }}" loading="lazy" />
     </a>
     {{ end }}

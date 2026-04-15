@@ -1,0 +1,6 @@
+name = "blog"
+compatibility_date = "2026-04-15"
+
+[[kv_namespaces]]
+binding = "STATS_KV"
+id = "d0c1c7a266824341993782221b59452e"

@@ -5,18 +5,17 @@
     <header class="flex flex-col gap-2">
       <h2 class="title-large">{{ .Title }}</h2>
 
-      <div class="meta">
-        <time datetime="{{ .PublishDate }}" title='{{ .PublishDate.Format "Mon, Jan 2, 2006, 3:04 PM MST" }}'>
-          {{ .PublishDate.Format "02/01/2006" }} - {{ printf (i18n "estimatedReadingTime") .ReadingTime }}
-        </time>
-
-        {{ with (.GetTerms "categories") }} —
-          {{ range . }}
-            <a class="categories" href="{{ .RelPermalink }}" alt="{{ .LinkTitle }}">
-              {{ .LinkTitle }}
-            </a>
-          {{ end }}
+      <div class="post-meta">
+        <time datetime="{{ .PublishDate }}">{{ .PublishDate.Format "2006年1月2日" }}</time>
+        <span>&middot;</span>
+        <span>{{ .ReadingTime }} 分钟阅读</span>
+        {{ with (.GetTerms "categories") }}
+        {{ range . }}
+        <span>&middot;</span>
+        <a href="{{ .RelPermalink }}" class="post-tag">{{ .LinkTitle }}</a>
         {{ end }}
+        {{ end }}
+        <span class="page-stats" id="page-stats"></span>
       </div>
     </header>
 

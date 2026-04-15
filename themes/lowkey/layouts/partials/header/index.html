@@ -1,7 +1,7 @@
 <header class="header-wrap">
   {{/* 移动端：头像+名字+BIO 居中，左侧返回（非首页），右侧汉堡 */}}
   <div class="sm:hidden flex flex-col items-center w-full relative py-2">
-    <a href="{{ .Site.BaseURL }}" class="flex flex-col items-center gap-1.5 no-underline">
+    <a href="/" class="flex flex-col items-center gap-1.5 no-underline">
       {{ $avatar := resources.GetMatch .Site.Params.avatar }}
       {{ $tiny := ($avatar.Fill "48x48 q90") }}
       <div class="w-12 h-12 rounded-full overflow-hidden">

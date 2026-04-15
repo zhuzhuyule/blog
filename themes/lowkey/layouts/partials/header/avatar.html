@@ -2,7 +2,7 @@
 {{ $tiny := ($avatar.Fill "40x40 q90") }}
 
 <div class="flex-none w-10 h-10 rounded-full overflow-hidden">
-  <a href="{{ .Site.BaseURL }}">
+  <a href="/">
     <img
       srcset="{{- with $tiny.RelPermalink -}}{{.}} 40w{{- end -}}"
       src="{{ $avatar.RelPermalink }}"

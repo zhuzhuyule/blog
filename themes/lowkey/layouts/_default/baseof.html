@@ -219,6 +219,94 @@
         }
       }
 
+      /* 访问统计（sessionStorage 缓存 5 分钟） */
+      var STATS_TTL = 5 * 60 * 1000;
+
+      function getCache(key) {
+        try {
+          var raw = sessionStorage.getItem('stats:' + key);
+          if (!raw) return null;
+          var c = JSON.parse(raw);
+          if (Date.now() - c.ts > STATS_TTL) { sessionStorage.removeItem('stats:' + key); return null; }
+          return c.pv;
+        } catch(e) { return null; }
+      }
+
+      function setCache(key, pv) {
+        try { sessionStorage.setItem('stats:' + key, JSON.stringify({ ts: Date.now(), pv: pv })); } catch(e) {}
+      }
+
+      function renderPV(el, pv) {
+        if (pv !== null && pv !== undefined) el.textContent = '· ' + pv + ' 次阅读';
+      }
+
+      /* 列表页：收集所有路径，一次批量请求，结果全部写入缓存 */
+      var listEls = document.querySelectorAll('.page-stats[data-path]');
+      if (listEls.length) {
+        var uncached = [];
+        listEls.forEach(function(el) {
+          var path = el.getAttribute('data-path');
+          var cached = getCache(path);
+          if (cached !== null) {
+            renderPV(el, cached);
+          } else {
+            uncached.push({ el: el, path: path });
+          }
+        });
+        if (uncached.length) {
+          var paths = uncached.map(function(u) { return u.path; }).join(',');
+          fetch('/api/stats?paths=' + encodeURIComponent(paths))
+            .then(function(r) { return r.json(); })
+            .then(function(d) {
+              uncached.forEach(function(u) {
+                var pv = d[u.path] ? d[u.path].pageviews : 0;
+                setCache(u.path, pv);
+                renderPV(u.el, pv);
+              });
+            }).catch(function() {});
+        }
+      }
+
+      /* 详情页：优先读缓存，过期才请求 */
+      var pageStatsEl = document.getElementById('page-stats');
+      if (pageStatsEl) {
+        var pagePath = location.pathname;
+        var cached = getCache(pagePath);
+        if (cached !== null) {
+          renderPV(pageStatsEl, cached);
+        } else {
+          fetch('/api/stats?path=' + encodeURIComponent(pagePath))
+            .then(function(r) { return r.json(); })
+            .then(function(d) {
+              setCache(pagePath, d.pageviews || 0);
+              renderPV(pageStatsEl, d.pageviews || 0);
+            }).catch(function() {});
+        }
+      }
+
+      /* 站点总览（眼睛图标 + 数字） */
+      var siteStatsEl = document.getElementById('site-stats');
+      if (siteStatsEl) {
+        function showSiteStats(pv) {
+          siteStatsEl.querySelector('.site-pv').textContent = pv;
+          siteStatsEl.classList.remove('hidden');
+          siteStatsEl.classList.add('inline-flex');
+        }
+        var siteCached = getCache('__site__');
+        if (siteCached !== null) {
+          showSiteStats(siteCached);
+        } else {
+          fetch('/api/site-stats')
+            .then(function(r) { return r.json(); })
+            .then(function(d) {
+              if (d.total_pageviews !== undefined) {
+                setCache('__site__', d.total_pageviews);
+                showSiteStats(d.total_pageviews);
+              }
+            }).catch(function() {});
+        }
+      }
+
       /* 回到顶部按钮显隐 */
       var topBtn = document.getElementById('back-to-top');
       if (topBtn) {

@@ -30,5 +30,5 @@ window.MathJax = {
   {{/* 生产环境：PostCSS 编译 + 压缩 + 指纹 */}}
   {{- $tailwind := resources.Get "css/tailwind.css" | postCSS (dict "config" "./config/postcss.config.js") -}}
   {{- $styles := slice $tailwind | resources.Concat "css/app.css" | minify | fingerprint | resources.PostProcess -}}
-  <link rel="stylesheet" href="{{ $styles.Permalink }}" integrity="{{ $styles.Data.Integrity }}" />
+  <link rel="stylesheet" href="{{ $styles.RelPermalink }}" integrity="{{ $styles.Data.Integrity }}" />
 {{- end -}}

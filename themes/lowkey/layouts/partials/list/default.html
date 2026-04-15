@@ -1,6 +1,6 @@
 <article class="flex flex-col gap-1">
     {{ if and .Params.featured_image (not (eq .Params.featured_image "")) }}
-    <a href="{{ .Permalink }}" class="block w-full h-48 mb-3 rounded-lg overflow-hidden">
+    <a href="{{ .RelPermalink }}" class="block w-full h-48 mb-3 rounded-lg overflow-hidden">
         <img 
             src="{{ .Params.featured_image | relURL }}" 
             alt="{{ .Title }}"
@@ -11,7 +11,7 @@
     {{ end }}
   
     <h1>
-        <a href="{{ .Permalink }}">{{ .Title }}</a>
+        <a href="{{ .RelPermalink }}">{{ .Title }}</a>
     </h1>
   
     <span class="date">
@@ -29,7 +29,7 @@
     </div>
 
     <div class="mt-2">
-        <a class="read-more" href="{{ .Permalink }}">
+        <a class="read-more" href="{{ .RelPermalink }}">
         {{ i18n "readMore" }}
         <span class="w-4 h-4 stroke-2">
             {{ partial "utils/icon" "arrow-right" }}
