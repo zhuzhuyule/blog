@@ -1,0 +1,36 @@
+# Homepage Config
+isSinglePage = true
+
+# Meta Config
+description = "A simple and humble blog"
+
+# Header Configuration
+avatar = "img/profile-picture.jpg"
+
+# Cover Image (Homepage Banner)
+coverImage = "img/cover.jpg"
+enableCover = true
+
+# Favicon
+favicon = "icons/favicon.ico"
+
+# Social Links Configuration
+[social]
+  github = "https://github.com/yourusername"
+  twitter = "https://twitter.com/yourusername"
+  email = "mailto:your@email.com"
+  rss = true
+
+# Disqus comment system
+disqusShortname = ""
+
+[emoji]
+  enableEmoji = true
+
+# Giscus comment system
+[giscus]
+  enable = false
+  repo = ""
+  repoId = ""
+  category = "Announcements"
+  categoryId = ""

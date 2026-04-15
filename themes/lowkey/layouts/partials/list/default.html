@@ -1,0 +1,39 @@
+<article class="flex flex-col gap-1">
+    {{ if and .Params.featured_image (not (eq .Params.featured_image "")) }}
+    <a href="{{ .Permalink }}" class="block w-full h-48 mb-3 rounded-lg overflow-hidden">
+        <img 
+            src="{{ .Params.featured_image | relURL }}" 
+            alt="{{ .Title }}"
+            class="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+            loading="lazy"
+        />
+    </a>
+    {{ end }}
+  
+    <h1>
+        <a href="{{ .Permalink }}">{{ .Title }}</a>
+    </h1>
+  
+    <span class="date">
+        <time datetime="{{ .PublishDate }}" title='{{ .PublishDate.Format "Mon, Jan 2, 2006, 3:04 PM MST" }}'>
+            {{ .PublishDate.Format "02/01/2006" }}
+        </time>
+    </span>
+
+    <div class="description">
+        {{ if .Params.description }}
+        {{ .Params.description }}
+        {{ else if .Summary }}
+        {{ .Summary }}
+        {{ end }}
+    </div>
+
+    <div class="mt-2">
+        <a class="read-more" href="{{ .Permalink }}">
+        {{ i18n "readMore" }}
+        <span class="w-4 h-4 stroke-2">
+            {{ partial "utils/icon" "arrow-right" }}
+        </span>
+        </a>
+    </div>
+</article>

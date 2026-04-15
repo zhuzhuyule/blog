@@ -1,0 +1,28 @@
+{{ define "main" }}
+
+{{ if and site.Params.enableCover (or (isset site.Params "coverimage") (isset site.Params "cover")) }}
+{{ $cover := "" }}
+{{ if isset site.Params "coverimage" }}
+    {{ $cover = site.Params.coverimage }}
+{{ else if isset site.Params "cover" }}
+    {{ $cover = site.Params.cover }}
+{{ end }}
+{{ if $cover }}
+<div class="relative w-full h-64 sm:h-80 mb-8 rounded-lg overflow-hidden">
+    <img 
+        src="{{ $cover | relURL }}" 
+        alt="Cover" 
+        class="w-full h-full object-cover"
+    />
+    <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+</div>
+{{ end }}
+{{ end }}
+
+<div class="py-2 flex flex-col gap-1">
+  <h3 class="title-small">{{ .Title }}</h3>
+</div>
+
+<section>{{ .Content }} </section>
+
+{{ end }}

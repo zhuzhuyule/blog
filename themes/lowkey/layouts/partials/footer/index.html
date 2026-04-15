@@ -1,0 +1,35 @@
+<footer class="pt-5 pb-10 grid gap-3 sm:grid-cols-2">
+    {{ partial "footer/copyright" . }}
+    <div class="order-1 sm:order-2">
+        <ul class="flex sm:justify-end gap-4">
+            {{ with site.Params.social.github }}
+            <li>
+                <a href="{{ . }}" target="_blank" rel="me noopener noreferrer" aria-label="GitHub">
+                    <span class="w-5 h-5">{{ partial "utils/icon" "github" }}</span>
+                </a>
+            </li>
+            {{ end }}
+            {{ with site.Params.social.twitter }}
+            <li>
+                <a href="{{ . }}" target="_blank" rel="me noopener noreferrer" aria-label="X (Twitter)">
+                    <span class="w-5 h-5">{{ partial "utils/icon" "x" }}</span>
+                </a>
+            </li>
+            {{ end }}
+            {{ with site.Params.social.email }}
+            <li>
+                <a href="{{ . }}" target="_blank" rel="me noopener noreferrer" aria-label="Email">
+                    <span class="w-5 h-5">{{ partial "utils/icon" "email" }}</span>
+                </a>
+            </li>
+            {{ end }}
+            {{ if site.Params.social.rss }}
+            <li>
+                <a href="{{ "index.xml" | relLangURL }}" target="_blank" rel="me noopener noreferrer" aria-label="RSS">
+                    <span class="w-5 h-5">{{ partial "utils/icon" "rss" }}</span>
+                </a>
+            </li>
+            {{ end }}
+        </ul>
+    </div>
+</footer>
