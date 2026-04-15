@@ -21,4 +21,4 @@ static/                         # 全局静态资源
 
 ## 写文章规范
 
-详见 `/write-post` 和 `/publish` skill。
+详见 `/write-post` 和 `/publish` 命令（`.claude/commands/` 目录）。
