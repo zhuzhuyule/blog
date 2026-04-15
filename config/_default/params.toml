@@ -14,12 +14,20 @@ favicon = "icons/favicon.ico"
 
 disqusShortname = ""
 
+# Cloudflare Web Analytics — 填入你的 beacon token
+cloudflareAnalytics = "51f45b96e4644e15acb0f82582a43ece"
+
 [emoji]
   enableEmoji = true
 
 [giscus]
-  enable = false
-  repo = ""
-  repoId = ""
+  enable = true
+  repo = "zhuzhuyule/blog"
+  repoId = "R_kgDOGaxhMg"
   category = "Announcements"
-  categoryId = ""
+  categoryId = "DIC_kwDOGaxhMs4C64rd"
+  mapping = "pathname"
+  reactionsEnabled = 1
+  inputPosition = "top"
+  lang = "zh-CN"
+  lazyLoading = true

@@ -7,11 +7,11 @@
       data-category-id="{{ .Site.Params.giscus.categoryId }}"
       data-mapping="{{ .Site.Params.giscus.mapping | default `pathname` }}"
       data-strict="{{ (string .Site.Params.giscus.strict) | default 0 }}"
-      data-reactions-enabled="{{ (string .Site.Params.giscus.reactionsEnabled) |  default 1 }}"
+      data-reactions-enabled="{{ (string .Site.Params.giscus.reactionsEnabled) | default 1 }}"
       data-emit-metadata="{{ (string .Site.Params.giscus.emitMetadata) | default 0 }}"
       data-input-position="{{ .Site.Params.giscus.inputPosition | default `top` }}"
-      data-theme="{{ .Site.Params.giscus.theme | default `light` }}"
-      data-lang="{{ .Site.Params.giscus.lang | default `en` }}"
+      data-theme="preferred_color_scheme"
+      data-lang="{{ .Site.Params.giscus.lang | default `zh-CN` }}"
       {{ if .Site.Params.giscus.lazyLoading }}
         data-loading="lazy"
       {{ end }}

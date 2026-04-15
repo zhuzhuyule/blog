@@ -68,6 +68,14 @@
         html.classList.remove('dark');
       }
       html.setAttribute('data-theme-mode', mode);
+      /* 同步 Giscus 主题 */
+      var giscusFrame = document.querySelector('iframe.giscus-frame');
+      if (giscusFrame) {
+        giscusFrame.contentWindow.postMessage(
+          { giscus: { setConfig: { theme: resolved === 'dark' ? 'dark' : 'light' } } },
+          'https://giscus.app'
+        );
+      }
     }
 
     function cycleTheme() {
