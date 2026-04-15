@@ -13,11 +13,21 @@ user_invocable: true
 首次执行时检查项目根目录是否存在 `.env.blog` 文件。如果不存在，自动创建并填入默认变量（值为空）：
 
 ```env
-# 图片生成 API 配置
+# 主 API 配置
 IMAGE_API_PROVIDER=        # openai / gemini / custom
 IMAGE_API_KEY=             # API Key
-IMAGE_API_ENDPOINT=        # 自定义端点（custom 模式）
+IMAGE_API_BASE_URL=        # API Base URL（如 https://api.openai.com/v1）
+IMAGE_API_MODEL=           # 模型名（如 dall-e-3 / imagen-3.0-generate-002）
+
+# 备用 API（主 API 失败时自动切换）
+IMAGE_FALLBACK_PROVIDER=   # openai / gemini / custom
+IMAGE_FALLBACK_KEY=        # 备用 API Key
+IMAGE_FALLBACK_BASE_URL=   # 备用 Base URL
+IMAGE_FALLBACK_MODEL=      # 备用模型名
+
+# 通用设置
 IMAGE_DEFAULT_STYLE=       # 默认风格：tech-dark / minimal / illustration
+IMAGE_DEFAULT_SIZE=        # 默认尺寸：1792x1024（OpenAI）/ 16:9（Gemini）
 ```
 
 同时确认 `.gitignore` 中包含 `.env.blog`。
@@ -123,11 +133,27 @@ frontmatter 设置 `math: true`，行内 `$E = mc^2$`，块级 `$$\sum_{i=1}^{n}
 如果 `.env.blog` 中 `IMAGE_API_KEY` 已配置：
 
 1. 读取 `.env.blog` 配置
-2. 根据 `IMAGE_API_PROVIDER` 调用对应 API（openai → DALL-E 3 / gemini → Imagen）
-3. 保存到文章目录 `cover.png`
-4. 自动插入到文章开头
+2. 根据 `IMAGE_API_PROVIDER` + `IMAGE_API_BASE_URL` + `IMAGE_API_MODEL` 调用 API
+3. **如果主 API 失败**（网络错误、配额不足、模型不可用等）：
+   - 立即提示用户失败原因
+   - 如果 `IMAGE_FALLBACK_KEY` 已配置，询问用户是否使用备用 API 重试
+   - 用户同意则用备用配置重试
+4. **如果备用也失败或未配置**：
+   - 输出 prompt 文案，提示用户手动生成（可复制到任意图片生成工具）
+   - 不要静默失败，必须告知用户
+5. 成功后保存到文章目录 `cover.png`，插入到文章开头
 
-如果未配置，输出 prompt 文案供用户手动生成。
+#### API 调用方式
+
+| Provider | Base URL | Model | 说明 |
+|----------|----------|-------|------|
+| openai | `https://api.openai.com/v1` | `dall-e-3` | POST `/images/generations` |
+| gemini | `https://generativelanguage.googleapis.com` | `imagen-3.0-generate-002` | Imagen API |
+| custom | 用户自定义 | 用户自定义 | 兼容 OpenAI 格式的第三方 API |
+
+`custom` 模式使用与 OpenAI 相同的请求格式，方便接入 Midjourney API、Stability AI 等第三方服务。
+
+如果未配置任何 API，直接输出 prompt 文案供用户手动生成。
 
 ### 配图规范
 
