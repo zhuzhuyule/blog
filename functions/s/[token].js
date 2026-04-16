@@ -29,7 +29,7 @@ export async function onRequest(context) {
   var html = await resp.text();
 
   // 注入分享横幅 + 隐藏分享操作区
-  var banner = '<div style="position:fixed;top:0;left:0;right:0;z-index:9999;background:#3b82f6;color:white;text-align:center;padding:8px 16px;font-size:14px;">你正在通过分享链接查看这篇草稿</div><div style="height:40px;"></div>';
+  var banner = '<style>body[data-shared]{padding-top:40px;}</style><div style="position:fixed;top:0;left:0;right:0;z-index:9999;background:#3b82f6;color:white;text-align:center;padding:8px 16px;font-size:14px;height:40px;box-sizing:border-box;">你正在通过分享链接查看这篇草稿</div>';
 
   var hideShareBar = '<style>#draft-share-bar{display:none!important;}</style>';
 
