@@ -24,7 +24,7 @@
       {{/* 未分享状态 */}}
       <div id="share-not-shared" class="hidden flex items-center justify-between">
         <span class="text-sm text-gray-500 dark:text-gray-400">此草稿尚未分享</span>
-        <button onclick="createShareLink()" class="text-sm px-3 py-1.5 rounded bg-blue-600 text-white hover:bg-blue-700 transition-colors">
+        <button onclick="createShareLink(event)" class="text-sm px-3 py-1.5 rounded bg-blue-600 text-white hover:bg-blue-700 transition-colors">
           创建分享链接
         </button>
       </div>
@@ -33,10 +33,10 @@
         <div class="flex items-center justify-between">
           <span class="text-sm text-blue-600 dark:text-blue-400 font-medium">已分享</span>
           <div class="flex gap-2">
-            <button onclick="resetShareLink()" class="text-sm px-3 py-1.5 rounded border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+            <button onclick="resetShareLink(event)" class="text-sm px-3 py-1.5 rounded border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
               重置链接
             </button>
-            <button onclick="revokeShareLink()" class="text-sm px-3 py-1.5 rounded border border-red-300 dark:border-red-700 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors">
+            <button onclick="revokeShareLink(event)" class="text-sm px-3 py-1.5 rounded border border-red-300 dark:border-red-700 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors">
               取消分享
             </button>
           </div>
@@ -114,6 +114,21 @@
     }
   }
 
+  function setLoading(btn, loading) {
+    if (!btn) return;
+    btn.disabled = loading;
+    if (loading) {
+      btn.dataset.origText = btn.textContent;
+      btn.textContent = '处理中…';
+      btn.style.opacity = '0.6';
+      btn.style.pointerEvents = 'none';
+    } else {
+      btn.textContent = btn.dataset.origText || btn.textContent;
+      btn.style.opacity = '';
+      btn.style.pointerEvents = '';
+    }
+  }
+
   // 查询当前分享状态
   fetch('/api/draft-share?slug=' + encodeURIComponent(slug))
     .then(function(r) { return r.json(); })
@@ -121,26 +136,35 @@
     .catch(function() { showState(false); });
 
   // 创建分享链接
-  window.createShareLink = function() {
+  window.createShareLink = function(e) {
+    var btn = e.target;
+    setLoading(btn, true);
     fetch('/api/draft-share?slug=' + encodeURIComponent(slug), { method: 'POST' })
       .then(function(r) { return r.json(); })
-      .then(function(d) { showState(true, d.token); });
+      .then(function(d) { showState(true, d.token); })
+      .finally(function() { setLoading(btn, false); });
   };
 
   // 重置分享链接
-  window.resetShareLink = function() {
+  window.resetShareLink = function(e) {
     if (!confirm('重置后旧链接将失效，确定？')) return;
+    var btn = e.target;
+    setLoading(btn, true);
     fetch('/api/draft-share?slug=' + encodeURIComponent(slug) + '&reset=1', { method: 'POST' })
       .then(function(r) { return r.json(); })
-      .then(function(d) { showState(true, d.token); });
+      .then(function(d) { showState(true, d.token); })
+      .finally(function() { setLoading(btn, false); });
   };
 
   // 取消分享
-  window.revokeShareLink = function() {
+  window.revokeShareLink = function(e) {
     if (!confirm('取消分享后链接将失效，确定？')) return;
+    var btn = e.target;
+    setLoading(btn, true);
     fetch('/api/draft-share?slug=' + encodeURIComponent(slug), { method: 'DELETE' })
       .then(function(r) { return r.json(); })
-      .then(function() { showState(false); });
+      .then(function() { showState(false); })
+      .finally(function() { setLoading(btn, false); });
   };
 
   // 复制链接

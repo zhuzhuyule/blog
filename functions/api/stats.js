@@ -2,14 +2,14 @@ function today() {
   return new Date().toISOString().slice(0, 10);
 }
 
-function yesterday() {
-  const d = new Date();
-  d.setDate(d.getDate() - 1);
+function daysAgo(n) {
+  var d = new Date();
+  d.setDate(d.getDate() - n);
   return d.toISOString().slice(0, 10);
 }
 
 async function cfQuery(env, query) {
-  const resp = await fetch('https://api.cloudflare.com/client/v4/graphql', {
+  var resp = await fetch('https://api.cloudflare.com/client/v4/graphql', {
     method: 'POST',
     headers: {
       'X-Auth-Email': env.CF_API_EMAIL,
@@ -21,64 +21,66 @@ async function cfQuery(env, query) {
   return resp.json();
 }
 
-// 查某路径某天区间的 PV
 function buildQuery(env, path, dateGe, dateLe) {
-  const filters = [
-    `{ siteTag: "${env.CF_SITE_TAG}" }`,
-    `{ date_geq: "${dateGe}" }`,
+  var filters = [
+    '{ siteTag: "' + env.CF_SITE_TAG + '" }',
+    '{ date_geq: "' + dateGe + '" }',
   ];
-  if (dateLe) filters.push(`{ date_leq: "${dateLe}" }`);
-  if (path) filters.push(`{ requestPath: "${path}" }`);
+  if (dateLe) filters.push('{ date_leq: "' + dateLe + '" }');
+  if (path) filters.push('{ requestPath: "' + path + '" }');
 
-  return `query { viewer { accounts(filter: { accountTag: "${env.CF_ACCOUNT_ID}" }) {
-    data: rumPageloadEventsAdaptiveGroups(filter: { AND: [${filters.join(',')}] }, limit: 1) { count }
-  } } }`;
+  return 'query { viewer { accounts(filter: { accountTag: "' + env.CF_ACCOUNT_ID + '" }) { data: rumPageloadEventsAdaptiveGroups(filter: { AND: [' + filters.join(',') + '] }, limit: 1) { count } } } }';
 }
 
-// 获取某路径的累计 PV（KV + 今天实时）
+function extractCount(data) {
+  return data?.data?.viewer?.accounts?.[0]?.data?.[0]?.count || 0;
+}
+
+// KV 存储格式：{ total: number, cutoffDate: "YYYY-MM-DD" }
+// total = cutoffDate 之前的所有 PV（已固化）
+// 每次请求：实时查最近 30 天数据，返回 total + last30days
 async function getStats(env, path) {
-  const KV = env.STATS_KV;
-  const kvKey = 'pv:' + (path || '__site__');
-  const todayStr = today();
+  var KV = env.STATS_KV;
+  var kvKey = 'pv:' + (path || '__site__');
+  var todayStr = today();
+  var cutoff = daysAgo(30); // 30 天前
 
   // 读 KV
-  let stored = null;
+  var stored = null;
   if (KV) {
-    const raw = await KV.get(kvKey);
+    var raw = await KV.get(kvKey);
     if (raw) stored = JSON.parse(raw);
   }
+  if (!stored) stored = { total: 0, cutoffDate: cutoff };
 
-  if (!stored) stored = { total: 0, lastDate: todayStr };
-
-  // 如果 lastDate < today，把 lastDate ~ yesterday 的数据累加进 total
-  if (stored.lastDate < todayStr && KV) {
-    const query = buildQuery(env, path, stored.lastDate, yesterday());
-    const data = await cfQuery(env, query);
-    const count = data?.data?.viewer?.accounts?.[0]?.data?.[0]?.count || 0;
-    stored.total += count;
-    stored.lastDate = todayStr;
+  // 如果 cutoffDate 比 30 天前还早，把中间的数据累加到 total
+  if (stored.cutoffDate < cutoff && KV) {
+    var query = buildQuery(env, path, stored.cutoffDate, daysAgo(31));
+    var data = await cfQuery(env, query);
+    stored.total += extractCount(data);
+    stored.cutoffDate = cutoff;
     await KV.put(kvKey, JSON.stringify(stored));
   }
 
-  // 查今天的实时数据
-  const todayQuery = buildQuery(env, path, todayStr, null);
-  const todayData = await cfQuery(env, todayQuery);
-  const todayCount = todayData?.data?.viewer?.accounts?.[0]?.data?.[0]?.count || 0;
+  // 查最近 30 天的实时数据（这部分始终从 API 拿，不固化）
+  var recentQuery = buildQuery(env, path, cutoff, null);
+  var recentData = await cfQuery(env, recentQuery);
+  var recentCount = extractCount(recentData);
 
-  return stored.total + todayCount;
+  return stored.total + recentCount;
 }
 
 export async function onRequestGet(context) {
-  const { request, env } = context;
-  const url = new URL(request.url);
-  const paths = url.searchParams.get('paths');
-  const path = url.searchParams.get('path');
+  var { request, env } = context;
+  var url = new URL(request.url);
+  var paths = url.searchParams.get('paths');
+  var path = url.searchParams.get('path');
 
   if (!env.CF_API_KEY || !env.CF_ACCOUNT_ID || !env.CF_SITE_TAG) {
     return Response.json({ error: 'Missing config' }, { status: 500 });
   }
 
-  const headers = {
+  var headers = {
     'Cache-Control': 'public, max-age=300',
     'Access-Control-Allow-Origin': '*',
   };
@@ -86,17 +88,17 @@ export async function onRequestGet(context) {
   try {
     // 批量模式
     if (paths) {
-      const pathList = paths.split(',').filter(Boolean).slice(0, 50);
-      const results = {};
-      await Promise.all(pathList.map(async (p) => {
+      var pathList = paths.split(',').filter(Boolean).slice(0, 50);
+      var results = {};
+      await Promise.all(pathList.map(async function(p) {
         results[p] = { pageviews: await getStats(env, p) };
       }));
-      return Response.json(results, { headers });
+      return Response.json(results, { headers: headers });
     }
 
     // 单页模式
-    const pv = await getStats(env, path || '/');
-    return Response.json({ path: path || '/', pageviews: pv }, { headers });
+    var pv = await getStats(env, path || '/');
+    return Response.json({ path: path || '/', pageviews: pv }, { headers: headers });
   } catch (err) {
     return Response.json({ error: err.message }, { status: 500 });
   }

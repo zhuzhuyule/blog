@@ -2,14 +2,14 @@ function today() {
   return new Date().toISOString().slice(0, 10);
 }
 
-function yesterday() {
-  const d = new Date();
-  d.setDate(d.getDate() - 1);
+function daysAgo(n) {
+  var d = new Date();
+  d.setDate(d.getDate() - n);
   return d.toISOString().slice(0, 10);
 }
 
 async function cfQuery(env, query) {
-  const resp = await fetch('https://api.cloudflare.com/client/v4/graphql', {
+  var resp = await fetch('https://api.cloudflare.com/client/v4/graphql', {
     method: 'POST',
     headers: {
       'X-Auth-Email': env.CF_API_EMAIL,
@@ -22,53 +22,55 @@ async function cfQuery(env, query) {
 }
 
 function buildSiteQuery(env, dateGe, dateLe) {
-  const filters = [
-    `{ siteTag: "${env.CF_SITE_TAG}" }`,
-    `{ date_geq: "${dateGe}" }`,
+  var filters = [
+    '{ siteTag: "' + env.CF_SITE_TAG + '" }',
+    '{ date_geq: "' + dateGe + '" }',
   ];
-  if (dateLe) filters.push(`{ date_leq: "${dateLe}" }`);
+  if (dateLe) filters.push('{ date_leq: "' + dateLe + '" }');
 
-  return `query { viewer { accounts(filter: { accountTag: "${env.CF_ACCOUNT_ID}" }) {
-    data: rumPageloadEventsAdaptiveGroups(filter: { AND: [${filters.join(',')}] }, limit: 1) { count }
-  } } }`;
+  return 'query { viewer { accounts(filter: { accountTag: "' + env.CF_ACCOUNT_ID + '" }) { data: rumPageloadEventsAdaptiveGroups(filter: { AND: [' + filters.join(',') + '] }, limit: 1) { count } } } }';
+}
+
+function extractCount(data) {
+  return data?.data?.viewer?.accounts?.[0]?.data?.[0]?.count || 0;
 }
 
 export async function onRequestGet(context) {
-  const { env } = context;
+  var { env } = context;
 
   if (!env.CF_API_KEY || !env.CF_ACCOUNT_ID || !env.CF_SITE_TAG) {
     return Response.json({ error: 'Missing config' }, { status: 500 });
   }
 
-  const KV = env.STATS_KV;
-  const kvKey = 'pv:__site__';
-  const todayStr = today();
+  var KV = env.STATS_KV;
+  var kvKey = 'pv:__site__';
+  var todayStr = today();
+  var cutoff = daysAgo(30);
 
   try {
-    let stored = null;
+    var stored = null;
     if (KV) {
-      const raw = await KV.get(kvKey);
+      var raw = await KV.get(kvKey);
       if (raw) stored = JSON.parse(raw);
     }
-    if (!stored) stored = { total: 0, lastDate: todayStr };
+    if (!stored) stored = { total: 0, cutoffDate: cutoff };
 
-    // 累加历史数据到 KV
-    if (stored.lastDate < todayStr && KV) {
-      const query = buildSiteQuery(env, stored.lastDate, yesterday());
-      const data = await cfQuery(env, query);
-      const count = data?.data?.viewer?.accounts?.[0]?.data?.[0]?.count || 0;
-      stored.total += count;
-      stored.lastDate = todayStr;
+    // 累加 cutoffDate ~ 30天前 的历史数据
+    if (stored.cutoffDate < cutoff && KV) {
+      var query = buildSiteQuery(env, stored.cutoffDate, daysAgo(31));
+      var data = await cfQuery(env, query);
+      stored.total += extractCount(data);
+      stored.cutoffDate = cutoff;
       await KV.put(kvKey, JSON.stringify(stored));
     }
 
-    // 今天实时
-    const todayQuery = buildSiteQuery(env, todayStr, null);
-    const todayData = await cfQuery(env, todayQuery);
-    const todayCount = todayData?.data?.viewer?.accounts?.[0]?.data?.[0]?.count || 0;
+    // 查最近 30 天实时数据
+    var recentQuery = buildSiteQuery(env, cutoff, null);
+    var recentData = await cfQuery(env, recentQuery);
+    var recentCount = extractCount(recentData);
 
     return Response.json({
-      total_pageviews: stored.total + todayCount,
+      total_pageviews: stored.total + recentCount,
     }, {
       headers: {
         'Cache-Control': 'public, max-age=300',
