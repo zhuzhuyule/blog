@@ -6,7 +6,11 @@ export async function onRequest(context) {
   // 验证 token
   var raw = await KV.get('share:' + token);
   if (!raw) {
-    return new Response('链接无效或已过期', {
+    var page404 = await env.ASSETS.fetch(new URL('/404.html', context.request.url).toString());
+    var html404 = await page404.text();
+    var notice = '<div style="text-align:center;padding:12px 16px;font-size:14px;color:#9ca3af;">此分享链接已失效或不存在</div>';
+    html404 = html404.replace('</main>', notice + '</main>');
+    return new Response(html404, {
       status: 404,
       headers: { 'Content-Type': 'text/html; charset=utf-8' },
     });
@@ -20,7 +24,11 @@ export async function onRequest(context) {
   var resp = await env.ASSETS.fetch(draftUrl.toString());
 
   if (!resp.ok) {
-    return new Response('草稿不存在', {
+    var page404 = await env.ASSETS.fetch(new URL('/404.html', context.request.url).toString());
+    var html404 = await page404.text();
+    var notice = '<div style="text-align:center;padding:12px 16px;font-size:14px;color:#9ca3af;">此草稿已被删除或移动</div>';
+    html404 = html404.replace('</main>', notice + '</main>');
+    return new Response(html404, {
       status: 404,
       headers: { 'Content-Type': 'text/html; charset=utf-8' },
     });

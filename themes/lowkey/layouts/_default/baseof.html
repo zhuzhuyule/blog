@@ -393,5 +393,8 @@
       });
     });
     </script>
+    {{ with site.Params.cloudflareanalytics }}
+    <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "{{ . }}"}'></script>
+    {{ end }}
   </body>
 </html>

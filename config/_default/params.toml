@@ -5,6 +5,9 @@ description = "代码 · 科技 · 折腾"
 avatar = "img/profile-picture.png"
 # 头像放在 assets/img/ 目录下（Hugo resources.GetMatch 需要）
 
+# Cloudflare Web Analytics — 填入你的 beacon token
+cloudflareAnalytics = "92b26919db6840e0bb00a009f20fec0e"
+
 favicon = "icons/favicon.ico"
 
 [social]
@@ -14,9 +17,6 @@ favicon = "icons/favicon.ico"
   rss = true
 
 disqusShortname = ""
-
-# Cloudflare Web Analytics — 填入你的 beacon token
-cloudflareAnalytics = "92b26919db6840e0bb00a009f20fec0e"
 
 [emoji]
   enableEmoji = true
