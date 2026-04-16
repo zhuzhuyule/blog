@@ -6,7 +6,7 @@ categories: ["折腾"]
 tags: ["Hugo", "Cloudflare", "Tailwind CSS", "博客"]
 ---
 
-![Hugo + Cloudflare 博客技术栈](cover.png "Hugo + Cloudflare Pages 驱动的技术博客")
+![Hugo + Cloudflare 博客技术栈](cover.jpg "Hugo + Cloudflare Pages 驱动的技术博客")
 
 搭建个人博客是程序员的经典折腾项目。这次我选择了 [Hugo](https://gohugo.io/) 作为静态站点生成器，配合 [Lowkey](https://github.com/nixentric/Lowkey-Hugo-Theme) 主题进行深度定制，部署在 [Cloudflare Pages](https://pages.cloudflare.com/) 上，最终打造出一个功能完整、体验流畅的技术博客。本文记录整个搭建过程和关键决策。
 
@@ -156,7 +156,6 @@ giscusFrame.contentWindow.postMessage(
 
 ### 架构设计
 
-![访问统计架构](stats-architecture.png "Pages Function + CF Analytics API + KV Storage")
 
 KV 中存储每个路径的累计数据：
 
