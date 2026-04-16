@@ -126,6 +126,24 @@
       });
     }
 
+    /* ---- 复制 Markdown ---- */
+    function copyMarkdown() {
+      var raw = document.getElementById('post-raw-md');
+      if (!raw) return;
+      var text = raw.textContent;
+      /* 追加出处信息 */
+      var footer = '\n\n---\n\n';
+      footer += '> 本文作者：' + document.querySelector('.title-large').textContent.trim() + '\n';
+      footer += '> 原文链接：' + location.href + '\n';
+      footer += '> 版权声明：本文采用 CC BY-NC-SA 4.0 许可协议，转载请注明出处。\n';
+      navigator.clipboard.writeText(text + footer).then(function() {
+        var btn = document.getElementById('copy-md-btn');
+        var orig = btn.innerHTML;
+        btn.innerHTML = '<svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>';
+        setTimeout(function() { btn.innerHTML = orig; }, 1500);
+      });
+    }
+
     function openSearch() {
       var overlay = document.getElementById('search-overlay');
       if (!overlay) return;

@@ -7,7 +7,7 @@
       data-category-id="{{ .Site.Params.giscus.categoryId }}"
       data-mapping="{{ .Site.Params.giscus.mapping | default `pathname` }}"
       data-strict="{{ (string .Site.Params.giscus.strict) | default 0 }}"
-      data-reactions-enabled="{{ (string .Site.Params.giscus.reactionsEnabled) | default 1 }}"
+      data-reactions-enabled="0"
       data-emit-metadata="{{ (string .Site.Params.giscus.emitMetadata) | default 0 }}"
       data-input-position="{{ .Site.Params.giscus.inputPosition | default `top` }}"
       data-theme="preferred_color_scheme"

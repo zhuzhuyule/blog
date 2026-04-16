@@ -677,6 +677,67 @@ section > p:first-child {
     @apply text-2xl sm:text-4xl leading-snug font-bold text-gray-900 dark:text-gray-300 mb-0 mt-0 pt-0;
   }
 
+  .post-copyright-title {
+    @apply flex items-center gap-2;
+  }
+
+  .title-action-btn {
+    @apply shrink-0 mt-1 sm:mt-2 p-1.5 rounded-md cursor-pointer transition-colors opacity-30 hover:opacity-100;
+    @apply text-gray-400 hover:text-gray-600 hover:bg-gray-100;
+    @apply dark:text-gray-500 dark:hover:text-gray-300 dark:hover:bg-gray-800;
+  }
+
+  /* 上一篇 / 下一篇导航 */
+  .post-nav {
+    @apply flex flex-col sm:flex-row gap-3 mt-8 pt-8 border-t border-gray-100 dark:border-gray-800;
+  }
+
+  .post-nav-item {
+    @apply flex-1 flex flex-col gap-1 px-4 py-3 rounded-lg no-underline transition-colors;
+    @apply bg-gray-50 hover:bg-gray-100;
+    @apply dark:bg-gray-800/50 dark:hover:bg-gray-800;
+  }
+
+  .post-nav-prev {
+    @apply items-start;
+  }
+
+  .post-nav-next {
+    @apply items-end text-right;
+  }
+
+  .post-nav-label {
+    @apply text-xs text-gray-400 dark:text-gray-500;
+  }
+
+  .post-nav-title {
+    @apply text-sm font-medium text-gray-700 dark:text-gray-300 leading-snug;
+  }
+
+  /* 版权声明 */
+  .post-copyright {
+    @apply mt-8 px-4 py-4 rounded-lg text-xs leading-relaxed border-l-4 border-emerald-400 dark:border-emerald-600;
+    @apply bg-gray-50 text-gray-500 dark:bg-gray-800/50 dark:text-gray-400;
+  }
+
+  .post-copyright p {
+    @apply mb-1;
+  }
+
+  .post-copyright a {
+    @apply text-emerald-600 dark:text-emerald-400 no-underline hover:underline;
+  }
+
+  .post-copyright-actions {
+    @apply flex flex-wrap gap-2 mt-3 pt-3 border-t border-gray-200/50 dark:border-gray-700/50;
+  }
+
+  .copyright-btn {
+    @apply inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-md cursor-pointer no-underline transition-colors;
+    @apply bg-white text-gray-500 hover:text-gray-700 hover:bg-gray-100 border border-gray-200;
+    @apply dark:bg-gray-800 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-gray-700 dark:border-gray-700;
+  }
+
   .title-small {
     @apply text-2xl font-extrabold text-gray-900 dark:text-gray-300;
   }

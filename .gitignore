@@ -7,3 +7,11 @@ public/
 .env.blog
 .wrangler/
 .playwright-cli/
+resources/_gen/
+
+# Gemini Illustrator Skill temporary files
+.claude/skills/gemini-illustrator/.session/
+.claude/skills/gemini-illustrator/.queue.json
+.claude/skills/gemini-illustrator/.generate.lock
+gemini_*.yml
+gemini_*.png
