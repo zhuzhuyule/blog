@@ -1,10 +1,5 @@
 {{ define "main" }}
 
-<div class="flex flex-col gap-4 mb-8">
-  <h1 class="text-2xl font-extrabold">{{ .Title }}</h1>
-  <p class="text-sm text-gray-500 dark:text-gray-400">这些文章尚未正式发布，仅登录用户可见。</p>
-</div>
-
 {{ $pages := .Pages }}
 {{ if $pages }}
 <section class="post-list">

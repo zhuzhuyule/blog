@@ -376,7 +376,7 @@ section > p:first-child {
   }
   
   .header-wrap {
-    @apply flex items-center justify-between py-6 sm:border-b sm:border-gray-100 dark:sm:border-gray-800;
+    @apply flex items-center justify-between py-6 mb-6 sm:border-b sm:border-gray-100 dark:sm:border-gray-800;
   }
 
   header nav > ul {
@@ -543,7 +543,7 @@ section > p:first-child {
 
   /* 文章 + TOC 两栏布局 */
   .article-layout {
-    @apply pt-0 sm:pt-8;
+    @apply pt-0 sm:pt-0;
   }
 
   /* TOC 侧边栏 —— 默认隐藏 */
@@ -787,6 +787,10 @@ section > p:first-child {
   /* 文章卡片 */
   .post-item {
     @apply flex flex-col py-6;
+  }
+
+  .post-item:first-child {
+    @apply pt-0;
   }
 
   .post-item + .post-item {

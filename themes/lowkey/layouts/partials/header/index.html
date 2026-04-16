@@ -10,7 +10,7 @@
       <span class="text-base font-bold text-gray-800 dark:text-gray-100">{{ .Site.Title }}</span>
     </a>
     {{ with site.Params.description }}
-    <span class="text-xs text-gray-400 dark:text-gray-500 mt-0.5">{{ . }}</span>
+    <span class="text-xs text-gray-400 dark:text-gray-500 mt-0.5 cursor-default" ondblclick="location.href='/d/'">{{ . }}</span>
     {{ end }}
     {{/* 移动端返回按钮已移除，通过导航菜单中的"首页"链接回首页 */}}
     {{/* 右侧汉堡菜单 */}}
@@ -27,7 +27,7 @@
     <div class="flex flex-col">
       {{ partial "header/title" . }}
       {{ with site.Params.description }}
-      <span class="text-xs text-gray-400 dark:text-gray-500">{{ . }}</span>
+      <span class="text-xs text-gray-400 dark:text-gray-500 cursor-default" ondblclick="location.href='/d/'">{{ . }}</span>
       {{ end }}
     </div>
   </div>

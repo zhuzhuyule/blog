@@ -1,13 +1,130 @@
 {{ define "main" }}
 
-<article class="flex flex-col gap-3">
-  <header>
-    <h2 class="title-small">{{ i18n "404_title" }}</h2>
-  </header>
+<style>
+  @keyframes beam-pulse {
+    0%, 100% { opacity: 0.15; }
+    50% { opacity: 0.35; }
+  }
+  @keyframes hover-ship {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
+  @keyframes suck-up {
+    0% { transform: translateY(0) scale(1); opacity: 1; }
+    50% { transform: translateY(-40px) scale(0.6); opacity: 0.7; }
+    85% { transform: translateY(-80px) scale(0.2); opacity: 0.3; }
+    100% { transform: translateY(-95px) scale(0.05); opacity: 0; }
+  }
+  @keyframes orbit-lights {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+  @keyframes twinkle {
+    0%, 100% { opacity: 0.1; }
+    50% { opacity: 0.5; }
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .fade-up { animation: fadeUp 0.5s ease both; }
+  .fade-up-1 { animation-delay: 0.15s; }
+  .fade-up-2 { animation-delay: 0.3s; }
+  .fade-up-3 { animation-delay: 0.45s; }
+  .suck-text { animation: suck-up 3.5s ease-in infinite; }
 
-  <section>
-    <p>{{ i18n "404_text" }}</p>
-  </section>
-</article>
+</style>
+
+<div class="flex flex-col items-center justify-center min-h-[60vh] text-center select-none">
+
+  <div class="mb-6 fade-up" style="animation-delay: 0s;">
+    <svg class="w-72 h-64 sm:w-80 sm:h-72" viewBox="0 0 320 280" fill="none" xmlns="http://www.w3.org/2000/svg">
+
+      {{/* 星星 */}}
+      <circle cx="30" cy="40" r="1.2" class="fill-emerald-400" style="animation: twinkle 3s ease infinite;"/>
+      <circle cx="290" cy="30" r="1" class="fill-gray-400 dark:fill-gray-600" style="animation: twinkle 4s ease infinite 0.5s;"/>
+      <circle cx="50" cy="200" r="1.5" class="fill-emerald-300" style="animation: twinkle 3.5s ease infinite 1s;"/>
+      <circle cx="280" cy="180" r="1" class="fill-gray-300 dark:fill-gray-600" style="animation: twinkle 4.2s ease infinite 0.8s;"/>
+      <circle cx="70" cy="90" r="0.8" class="fill-gray-400 dark:fill-gray-500" style="animation: twinkle 2.8s ease infinite 1.5s;"/>
+      <circle cx="260" cy="100" r="1.2" class="fill-emerald-400" style="animation: twinkle 3.2s ease infinite 2s;"/>
+
+      {{/* 飞碟整体 - 浮动 */}}
+      <g style="animation: hover-ship 4s ease-in-out infinite;">
+
+        {{/* 光束 - 黄色梯形 */}}
+        <defs>
+          <linearGradient id="beam-grad" x1="160" y1="115" x2="160" y2="240" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#facc15" stop-opacity="0.4"/>
+            <stop offset="100%" stop-color="#facc15" stop-opacity="0"/>
+          </linearGradient>
+        </defs>
+        <path d="M 135 115 L 105 240 L 215 240 L 185 115 Z" fill="url(#beam-grad)" style="animation: beam-pulse 2.5s ease infinite;"/>
+
+        {{/* 飞碟玻璃罩 */}}
+        <ellipse cx="160" cy="88" rx="22" ry="16" class="fill-emerald-100 dark:fill-emerald-900" opacity="0.6"/>
+        <ellipse cx="160" cy="88" rx="22" ry="16" class="stroke-emerald-400 dark:stroke-emerald-500" stroke-width="1.5" fill="none"/>
+        <path d="M 148 80 Q 155 75 162 80" class="stroke-emerald-300 dark:stroke-emerald-600" stroke-width="1" fill="none" opacity="0.6"/>
+
+        {{/* 飞碟主体圆盘 */}}
+        <ellipse cx="160" cy="102" rx="50" ry="14" class="fill-gray-200 dark:fill-gray-700"/>
+        <ellipse cx="160" cy="102" rx="50" ry="14" class="stroke-gray-300 dark:stroke-gray-600" stroke-width="1.5" fill="none"/>
+
+        {{/* 旋转的黄色灯 - 沿椭圆轨道旋转 */}}
+        <g style="animation: orbit-lights 6s linear infinite; transform-origin: 160px 102px;">
+          <circle cx="210" cy="102" r="3" fill="#facc15" opacity="0.9"/>
+          <circle cx="160" cy="116" r="3" fill="#facc15" opacity="0.9"/>
+          <circle cx="110" cy="102" r="3" fill="#facc15" opacity="0.9"/>
+          <circle cx="160" cy="88" r="3" fill="#facc15" opacity="0.9"/>
+        </g>
+
+        {{/* 飞碟底部 */}}
+        <ellipse cx="160" cy="108" rx="30" ry="7" class="fill-gray-300 dark:fill-gray-600"/>
+        <ellipse cx="160" cy="108" rx="30" ry="7" class="stroke-gray-400 dark:stroke-gray-500" stroke-width="1" fill="none"/>
+      </g>
+
+      {{/* 404 文字 - 起始位置在光束下方，被吸到飞碟底部(y=108)消失 */}}
+      <g class="suck-text" style="transform-origin: 160px 210px;">
+        <text x="160" y="215" text-anchor="middle" font-size="36" font-weight="800" font-family="system-ui, sans-serif" letter-spacing="-1" class="fill-gray-300 dark:fill-gray-700">404</text>
+      </g>
+
+      {{/* 地面阴影 */}}
+      <ellipse cx="160" cy="248" rx="70" ry="4" class="fill-gray-100 dark:fill-gray-800" opacity="0.5"/>
+    </svg>
+  </div>
+
+  <div class="fade-up fade-up-1 flex items-center gap-3">
+    <a href="/" id="home-btn" class="group inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 hover:border-emerald-400 hover:text-emerald-600 dark:hover:text-emerald-400">
+      <svg class="w-4 h-4 transition-transform duration-200 group-hover:-translate-x-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1"/>
+      </svg>
+      返回首页
+    </a>
+    <div class="relative w-9 h-9 flex items-center justify-center" style="transform: rotate(-90deg);">
+      <svg class="absolute inset-0" width="36" height="36" viewBox="0 0 40 40">
+        <circle cx="20" cy="20" r="18" class="stroke-gray-200 dark:stroke-gray-700" stroke-width="2" fill="none"/>
+        <circle cx="20" cy="20" r="18" class="stroke-emerald-500 dark:stroke-emerald-400" stroke-width="2" fill="none" id="countdown-ring" stroke-dasharray="113" stroke-dashoffset="0" style="transition: stroke-dashoffset 1s linear;"/>
+      </svg>
+      <span id="countdown-num" class="text-xs font-medium text-gray-400 dark:text-gray-500" style="transform: rotate(90deg); width: 1.5em; text-align: center; font-variant-numeric: tabular-nums;"></span>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  var total = 10, seconds = total;
+  var numEl = document.getElementById('countdown-num');
+  var ringEl = document.getElementById('countdown-ring');
+  var btn = document.getElementById('home-btn');
+  var C = 2 * Math.PI * 18;
+  function tick() {
+    if (seconds <= 0) { btn.click(); return; }
+    numEl.textContent = seconds;
+    ringEl.style.strokeDashoffset = C * (1 - seconds / total);
+    seconds--;
+    setTimeout(tick, 1000);
+  }
+  tick();
+})();
+</script>
 
 {{ end }}

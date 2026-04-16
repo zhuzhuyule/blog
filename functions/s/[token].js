@@ -16,7 +16,7 @@ export async function onRequest(context) {
   var slug = data.slug;
 
   // 获取草稿页面静态内容
-  var draftUrl = new URL('/drafts/' + slug + '/', context.request.url);
+  var draftUrl = new URL('/d/' + slug + '/', context.request.url);
   var resp = await env.ASSETS.fetch(draftUrl.toString());
 
   if (!resp.ok) {
