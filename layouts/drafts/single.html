@@ -1,0 +1,158 @@
+{{ define "main" }}
+
+<div class="article-layout">
+  <article class="article-content flex flex-col gap-4 sm:gap-8">
+    <header class="flex flex-col gap-2">
+      <h2 class="title-large">{{ .Title }}</h2>
+
+      <div class="post-meta">
+        <time datetime="{{ .PublishDate }}">{{ .PublishDate.Format "2006年1月2日" }}</time>
+        <span>&middot;</span>
+        <span>{{ .ReadingTime }} 分钟阅读</span>
+        {{ with (.GetTerms "categories") }}
+        {{ range . }}
+        <span>&middot;</span>
+        <a href="{{ .RelPermalink }}" class="post-tag">{{ .LinkTitle }}</a>
+        {{ end }}
+        {{ end }}
+        <span class="inline-flex items-center gap-1 text-xs px-1.5 py-0.5 rounded bg-amber-100 dark:bg-amber-900 text-amber-700 dark:text-amber-300 ml-1">草稿</span>
+      </div>
+    </header>
+
+    {{/* 分享操作区 */}}
+    <div id="draft-share-bar" class="hidden p-4 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700" data-slug="{{ .File.ContentBaseName }}">
+      {{/* 未分享状态 */}}
+      <div id="share-not-shared" class="hidden flex items-center justify-between">
+        <span class="text-sm text-gray-500 dark:text-gray-400">此草稿尚未分享</span>
+        <button onclick="createShareLink()" class="text-sm px-3 py-1.5 rounded bg-blue-600 text-white hover:bg-blue-700 transition-colors">
+          创建分享链接
+        </button>
+      </div>
+      {{/* 已分享状态 */}}
+      <div id="share-shared" class="hidden flex flex-col gap-3">
+        <div class="flex items-center justify-between">
+          <span class="text-sm text-blue-600 dark:text-blue-400 font-medium">已分享</span>
+          <div class="flex gap-2">
+            <button onclick="resetShareLink()" class="text-sm px-3 py-1.5 rounded border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+              重置链接
+            </button>
+            <button onclick="revokeShareLink()" class="text-sm px-3 py-1.5 rounded border border-red-300 dark:border-red-700 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors">
+              取消分享
+            </button>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <input id="share-url" type="text" readonly class="flex-1 text-sm px-3 py-1.5 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300" />
+          <button onclick="copyShareLink()" id="copy-share-btn" class="text-sm px-3 py-1.5 rounded bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">
+            复制
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <section>{{ .Content | emojify }}</section>
+
+    {{/* 上一篇 / 下一篇 */}}
+    {{ if or .PrevInSection .NextInSection }}
+    <nav class="post-nav">
+      {{ with .PrevInSection }}
+      <a href="{{ .RelPermalink }}" class="post-nav-item post-nav-prev">
+        <span class="post-nav-label">上一篇</span>
+        <span class="post-nav-title">{{ .Title }}</span>
+      </a>
+      {{ end }}
+      {{ with .NextInSection }}
+      <a href="{{ .RelPermalink }}" class="post-nav-item post-nav-next">
+        <span class="post-nav-label">下一篇</span>
+        <span class="post-nav-title">{{ .Title }}</span>
+      </a>
+      {{ end }}
+    </nav>
+    {{ end }}
+
+    <footer>
+      {{ with (.GetTerms "tags") }}
+        <div class="pb-14 taxonomy-list tags-list">
+        {{ range . }}
+          <a href="{{ .RelPermalink }}" alt="{{ .LinkTitle }}">
+            {{ .LinkTitle }}
+          </a>
+        {{ end }}
+        </div>
+      {{ end }}
+    </footer>
+  </article>
+
+  {{ if .TableOfContents }}
+  <aside class="toc-sidebar">
+    <nav class="toc-nav" id="toc-nav">
+      <h3 class="toc-heading">目录</h3>
+      {{ .TableOfContents }}
+    </nav>
+  </aside>
+  <div id="mobile-toc-source" class="hidden">{{ .TableOfContents }}</div>
+  {{ end }}
+</div>
+
+<script>
+(function() {
+  var bar = document.getElementById('draft-share-bar');
+  var slug = bar.getAttribute('data-slug');
+  var notShared = document.getElementById('share-not-shared');
+  var shared = document.getElementById('share-shared');
+  var shareUrl = document.getElementById('share-url');
+
+  function showState(isShared, token) {
+    bar.classList.remove('hidden');
+    if (isShared) {
+      notShared.classList.add('hidden');
+      shared.classList.remove('hidden');
+      shareUrl.value = location.origin + '/s/' + token;
+    } else {
+      notShared.classList.remove('hidden');
+      shared.classList.add('hidden');
+    }
+  }
+
+  // 查询当前分享状态
+  fetch('/api/draft-share?slug=' + encodeURIComponent(slug))
+    .then(function(r) { return r.json(); })
+    .then(function(d) { showState(d.shared, d.token); })
+    .catch(function() { showState(false); });
+
+  // 创建分享链接
+  window.createShareLink = function() {
+    fetch('/api/draft-share?slug=' + encodeURIComponent(slug), { method: 'POST' })
+      .then(function(r) { return r.json(); })
+      .then(function(d) { showState(true, d.token); });
+  };
+
+  // 重置分享链接
+  window.resetShareLink = function() {
+    if (!confirm('重置后旧链接将失效，确定？')) return;
+    fetch('/api/draft-share?slug=' + encodeURIComponent(slug) + '&reset=1', { method: 'POST' })
+      .then(function(r) { return r.json(); })
+      .then(function(d) { showState(true, d.token); });
+  };
+
+  // 取消分享
+  window.revokeShareLink = function() {
+    if (!confirm('取消分享后链接将失效，确定？')) return;
+    fetch('/api/draft-share?slug=' + encodeURIComponent(slug), { method: 'DELETE' })
+      .then(function(r) { return r.json(); })
+      .then(function() { showState(false); });
+  };
+
+  // 复制链接
+  window.copyShareLink = function() {
+    var url = shareUrl.value;
+    navigator.clipboard.writeText(url).then(function() {
+      var btn = document.getElementById('copy-share-btn');
+      btn.textContent = '已复制';
+      setTimeout(function() { btn.textContent = '复制'; }, 1500);
+    });
+  };
+})();
+</script>
+
+{{ end }}
