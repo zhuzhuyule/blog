@@ -22,3 +22,10 @@ static/                         # 全局静态资源
 ## 写文章规范
 
 详见 `/write-post` 和 `/publish` 命令（`.claude/commands/` 目录）。
+
+## 草稿系统
+
+- 草稿放在 `content/drafts/{slug}/index.md`，受 Cloudflare Access 保护
+- 分享链接通过 `/s/<token>` 访问，token 存储在 KV（`share:` 和 `draft:` 前缀）
+- 发布：将目录从 `content/drafts/` 移到 `content/posts/`
+- 管理分享：在草稿文章页面内操作（创建/重置/取消分享）
