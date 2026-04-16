@@ -1,0 +1,59 @@
+{{ define "main" }}
+
+<div class="flex flex-col gap-4 mb-8">
+  <h1 class="text-2xl font-extrabold">{{ .Title }}</h1>
+  <p class="text-sm text-gray-500 dark:text-gray-400">这些文章尚未正式发布，仅登录用户可见。</p>
+</div>
+
+{{ $pages := .Pages }}
+{{ if $pages }}
+<section class="post-list">
+  {{ range $index, $page := $pages }}
+  <article class="post-item post-animate" style="animation-delay: {{ mul $index 40 }}ms" data-draft-slug="{{ $page.File.ContentBaseName }}">
+    <div class="flex items-center gap-2">
+      <a href="{{ $page.RelPermalink }}" class="post-title">{{ $page.Title }}</a>
+      <span class="draft-share-badge hidden text-xs px-1.5 py-0.5 rounded bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300">已分享</span>
+    </div>
+    <div class="post-meta">
+      <time datetime="{{ $page.Date.Format "2006-01-02" }}">{{ $page.Date.Format "2006年1月2日" }}</time>
+      <span>&middot;</span>
+      <span>{{ $page.ReadingTime }} 分钟阅读</span>
+      {{ with ($page.GetTerms "categories") }}
+      {{ range . }}
+      <span>&middot;</span>
+      <a href="{{ .RelPermalink }}" class="post-tag">{{ .LinkTitle }}</a>
+      {{ end }}
+      {{ end }}
+    </div>
+    {{ if $page.Params.description }}
+    <p class="post-summary">{{ $page.Params.description }}</p>
+    {{ end }}
+  </article>
+  {{ end }}
+</section>
+{{ else }}
+<p class="text-gray-500 dark:text-gray-400">暂无草稿。</p>
+{{ end }}
+
+<script>
+(function() {
+  var articles = document.querySelectorAll('[data-draft-slug]');
+  if (!articles.length) return;
+  var slugs = [];
+  articles.forEach(function(el) { slugs.push(el.getAttribute('data-draft-slug')); });
+
+  fetch('/api/draft-share?slugs=' + encodeURIComponent(slugs.join(',')))
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      articles.forEach(function(el) {
+        var slug = el.getAttribute('data-draft-slug');
+        if (data[slug] && data[slug].shared) {
+          el.querySelector('.draft-share-badge').classList.remove('hidden');
+        }
+      });
+    })
+    .catch(function() {});
+})();
+</script>
+
+{{ end }}
