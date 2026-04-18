@@ -4,7 +4,7 @@ date: 2026-04-16
 description: "涵盖 Cloudflare 的转发功能、健康检查/监控，以及如何结合 Hugo 文档系统进行转发和健全检测的完整配置示例"
 categories: ["Cloudflare"]
 tags: ["Cloudflare", "转发", "健康检查", "监控", "DNS"]
-draft: true
+draft: false
 --
 
 # Cloudflare 转发与健全检测配置指南
